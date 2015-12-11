@@ -1,0 +1,49 @@
+{
+  "name": "somafm",
+  "version": "0.0.0",
+  "description": "List, play, and record SomaFM radio channels.",
+  "license": "MIT",
+  "repository": "uschek/somafm",
+  "author": {
+    "name": "Christoph Uschkrat",
+    "email": "c.uschkrat@gmail.com"
+  },
+  "bin": {
+    "somafm": "cli.js"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "test": "xo"
+  },
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
+  "keywords": [
+    "somafm",
+    "radio",
+    "stream",
+    "rip",
+    "streamripper",
+    "mp3",
+    "audio"
+  ],
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "dateformat": "^1.0.11",
+    "got": "^4.2.0",
+    "isbin": "0.0.2",
+    "minimist": "^1.2.0",
+    "object-assign": "^4.0.1",
+    "trim": "0.0.1",
+    "xml2js": "^0.4.12"
+  },
+  "devDependencies": {
+    "xo": "^0.11.2"
+  },
+  "xo": {
+    "space": true
+  }
+}
