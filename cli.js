@@ -203,12 +203,12 @@ function init(args, options) {
 
   if (args.indexOf('list') === 0) {
     list();
-    process.exit();
+    return;
   }
 
   if ((args.indexOf('get') === 0 || args.indexOf('show') === 0) && args[1]) {
     get();
-    process.exit();
+    return;
   }
 
   if (args.indexOf('play') === 0 && args[1]) {
@@ -225,7 +225,7 @@ function init(args, options) {
         }
       });
     });
-    process.exit();
+    return;
   }
 
   if (args.indexOf('record') === 0 && args[1]) {
@@ -242,7 +242,7 @@ function init(args, options) {
         }
       });
     });
-    process.exit();
+    return;
   }
 
   if (args.indexOf('raw') === 0) {
@@ -255,7 +255,7 @@ function init(args, options) {
         somafm.dump(channels);
       }
     );
-    process.exit();
+    return;
   }
 
   if (args.indexOf('debug') === 0) {
@@ -268,7 +268,7 @@ function init(args, options) {
         console.dir(res);
       }
     );
-    process.exit();
+    return;
   }
 
   showHelp();
