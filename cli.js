@@ -110,7 +110,7 @@ function play(channel, cb) {
   mplayerProc.stdout.on('data', function (data) {
     var line = data.toString();
 
-    var regex = /StreamTitle='([^']*)'/;
+    var regex = /StreamTitle='(.*)';StreamUrl=/;
     var res = line.match(regex);
 
     if (res && res[1]) {
