@@ -25,7 +25,7 @@ function showHelp() {
   ${pkg.description}
 
   Usage
-    somafm <command> [<options>]
+    somafm <command> [<channel>]
 
   Commands
     list                list channels
