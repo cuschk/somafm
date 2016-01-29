@@ -4,6 +4,7 @@ var got = require('got');
 var xml2js = require('xml2js').parseString;
 var objectAssign = require('object-assign');
 var util = require('util');
+var trim = require('trim');
 
 var preferredStreams = [
   {quality: 'highestpls', format: 'aac'},
@@ -65,7 +66,7 @@ somafm.getChannels = function (options, cb) {
         id: channel.$.id,
         title: channel.title[0],
         fullTitle: 'SomaFM ' + channel.title[0],
-        description: channel.description[0],
+        description: trim(channel.description[0]),
         dj: channel.dj[0],
         genre: channel.genre[0],
         lastPlaying: channel.lastPlaying[0],
