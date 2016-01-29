@@ -10,10 +10,10 @@ var childProcess = require('child_process');
 var isBin = require('isbin');
 var dateFormat = require('dateformat');
 var trim = require('trim');
+var termTitle = require('term-title');
 
 var options = minimist(process.argv.slice(2));
 var args = options._;
-
 delete options._;
 
 var mplayerBin = 'mplayer';
@@ -116,6 +116,8 @@ function play(channel, cb) {
     if (res && res[1]) {
       var time = dateFormat(new Date(), 'HH:MM:ss');
       console.log(`  ${chalk.yellow(time)}  ${res[1]}`);
+
+      termTitle(`▶ ${res[1]}`);
     }
   });
 
@@ -274,5 +276,10 @@ function init(args, options) {
   showHelp();
   process.exit(1);
 }
+
+process.on('SIGINT', function () {
+  termTitle();
+  process.exit();
+});
 
 init(args, options);
