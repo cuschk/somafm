@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-
 'use strict';
-
 var pkg = require('./package.json');
 var somafm = require('./');
 var chalk = require('chalk');
@@ -127,7 +125,6 @@ function play(channel, cb) {
   });
 
   mplayerProc.on('exit', function () {
-    console.log('\nMPlayer exited.');
     cb(null);
     return;
   });
@@ -244,32 +241,6 @@ function init(args, options) {
         }
       });
     });
-    return;
-  }
-
-  if (args.indexOf('raw') === 0) {
-    somafm.getChannels({sortChannels: false, raw: true},
-      function (err, channels) {
-        if (err) {
-          throw err;
-        }
-
-        somafm.dump(channels);
-      }
-    );
-    return;
-  }
-
-  if (args.indexOf('debug') === 0) {
-    somafm.getChannels({sortChannels: true},
-      function (err, res) {
-        if (err) {
-          throw err;
-        }
-
-        console.dir(res);
-      }
-    );
     return;
   }
 

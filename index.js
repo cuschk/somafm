@@ -3,7 +3,6 @@
 var got = require('got');
 var xml2js = require('xml2js').parseString;
 var objectAssign = require('object-assign');
-var util = require('util');
 var trim = require('trim');
 
 var preferredStreams = [
@@ -124,8 +123,4 @@ somafm.getChannel = function (id, cb) {
       return cb(new Error('Channel not found.'), null);
     }
   );
-};
-
-somafm.dump = function (obj) {
-  console.log(util.inspect(obj, {showHidden: false, depth: null}));
 };
