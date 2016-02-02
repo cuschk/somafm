@@ -27,13 +27,13 @@ function showHelp() {
 
   Commands
     list                list channels
-    get <channel>       show channel information
+    info <channel>      show channel information
     play <channel>      play channel
     record <channel>    start recording channel
 
   Examples
     somafm list
-    somafm get groovesalad
+    somafm info groovesalad
     somafm play fluid`
   );
 }
@@ -79,7 +79,7 @@ function list() {
   );
 }
 
-function get() {
+function info() {
   somafm.getChannel(args[1], function (err, channel) {
     if (err) {
       console.error(err.toString());
@@ -206,8 +206,8 @@ function init(args, options) {
     return;
   }
 
-  if ((args.indexOf('get') === 0 || args.indexOf('show') === 0) && args[1]) {
-    get();
+  if ((args.indexOf('info') === 0) && args[1]) {
+    info();
     return;
   }
 
