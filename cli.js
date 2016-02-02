@@ -96,7 +96,7 @@ function play(channel, cb) {
     return;
   }
 
-  console.log(`\n  Playing ${chalk.bold(channel.fullTitle)} ...\n`);
+  console.log(`\n  Playing ${chalk.bold(channel.fullTitle)}\n`);
 
   var args = [
     '-quiet',
@@ -110,12 +110,16 @@ function play(channel, cb) {
 
     var regex = /StreamTitle='(.*)';StreamUrl=/;
     var res = line.match(regex);
+    var title;
 
-    if (res && res[1]) {
+    if (res && (title = res[1])) {
       var time = dateFormat(new Date(), 'HH:MM:ss');
-      console.log(`  ${chalk.yellow(time)}  ${res[1]}`);
 
-      termTitle(`▶ ${res[1]}`);
+      var titleOut = title.match(/^SomaFM/) ? `>> ${title}` : title;
+      var titleHead = `▶ ${title}`;
+
+      console.log(`  ${chalk.yellow(time)}  ${titleOut}`);
+      termTitle(titleHead);
     }
   });
 
@@ -148,7 +152,7 @@ function record(channel, cb) {
 
   console.log(`
   Recording ${chalk.bold(channel.fullTitle)}
-  to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)} ...\n`
+  to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
   );
 
   streamripperProc.stdout.on('data', function (data) {

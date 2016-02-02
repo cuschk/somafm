@@ -1,5 +1,4 @@
 'use strict';
-
 var got = require('got');
 var xml2js = require('xml2js').parseString;
 var objectAssign = require('object-assign');
