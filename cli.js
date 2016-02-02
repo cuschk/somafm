@@ -103,7 +103,7 @@ function play(channel, cb) {
     '-playlist',
     channel.stream.url
   ];
-  var mplayerProc = childProcess.spawn(mplayerBin, args);
+  var mplayerProc = childProcess.spawn(mplayerBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
 
   mplayerProc.stdout.on('data', function (data) {
     var line = data.toString();
@@ -125,6 +125,7 @@ function play(channel, cb) {
   });
 
   mplayerProc.on('exit', function () {
+    termTitle();
     cb(null);
     return;
   });
@@ -141,7 +142,7 @@ function record(channel, cb) {
     channel.stream.url,
     '-D', `${channel.fullTitle}/${date}/%1q %A - %T`
   ];
-  var streamripperProc = childProcess.spawn(streamripperBin, args);
+  var streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
   var currentStatus;
   var currentSong;
 
