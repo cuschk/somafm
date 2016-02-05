@@ -66,7 +66,7 @@ somafm.getChannels = function (options, cb) {
         fullTitle: 'SomaFM ' + channel.title[0],
         description: trim(channel.description[0]),
         dj: channel.dj[0],
-        genre: channel.genre[0],
+        genre: channel.genre[0].replace(/\|/g, '/'),
         lastPlaying: channel.lastPlaying[0],
         listeners: channel.listeners[0],
         stream: streamHighestQuality
