@@ -43,7 +43,7 @@ function showChannelList(channels) {
 
   channels.forEach(function (channel) {
     console.log(
-      `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] ${chalk.blue(channel.description)}`
+      `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`
     );
   });
 }
