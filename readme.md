@@ -40,12 +40,12 @@ cliqhop idm [cliqhop] Blips'n'beeps backed mostly w/beats. Intelligent Dance Mus
 ...
 ```
 
-### `somafm get <channel>`
+### `somafm info <channel>`
 
 Get channel information.
 
 ```
-$ somafm get groovesalad
+$ somafm info groovesalad
 
   SomaFM Groove Salad [groovesalad]
 
