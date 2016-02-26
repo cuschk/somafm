@@ -1,4 +1,5 @@
 'use strict';
+var pkg = require('./package.json');
 var got = require('got');
 var xml2js = require('xml2js').parseString;
 var objectAssign = require('object-assign');
@@ -12,6 +13,12 @@ var preferredStreams = [
   {quality: 'slowpls', format: 'aacp'},
   {quality: 'slowpls', format: 'mp3'}
 ];
+
+var gotOpts = {
+  headers: {
+    'user-agent': `somafm/${pkg.version} (https://github.com/uschek/somafm)`
+  }
+};
 
 var somafm = module.exports;
 
@@ -27,7 +34,7 @@ somafm.getChannels = function (options, cb) {
 
   options.streams = objectAssign(preferredStreams, options.streams);
 
-  got('http://somafm.com/channels.xml', function (err, data) {
+  got('http://somafm.com/channels.xml', gotOpts, function (err, data) {
     parseXml(err, data, options);
   });
 
