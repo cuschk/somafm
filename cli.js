@@ -119,7 +119,7 @@ function play(channel, cb) {
     if (res && (title = res[1])) {
       var time = dateFormat(new Date(), 'HH:MM:ss');
 
-      var titleOut = title.match(new RegExp(`^SomaFM|${channel.title}`), 'i') ? `>> ${title}` : title;
+      var titleOut = title.match(new RegExp(`SomaFM|${channel.title}`), 'i') ? `>> ${title}` : title;
       var titleHead = `▶ ${title}`;
 
       console.log(`  ${chalk.yellow(time)}  ${titleOut}`);

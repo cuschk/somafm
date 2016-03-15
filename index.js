@@ -34,7 +34,7 @@ somafm.getChannels = function (options, cb) {
 
   options.streams = objectAssign(preferredStreams, options.streams);
 
-  got('http://somafm.com/channels.xml', gotOpts, function (err, data) {
+  got('https://somafm.com/channels.xml', gotOpts, function (err, data) {
     parseXml(err, data, options);
   });
 
