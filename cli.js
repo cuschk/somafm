@@ -9,6 +9,7 @@ var isBin = require('isbin');
 var dateFormat = require('dateformat');
 var trim = require('trim');
 var termTitle = require('term-title');
+var cliTruncate = require('cli-truncate');
 
 var options = minimist(process.argv.slice(2));
 var args = options._;
@@ -43,7 +44,10 @@ function showChannelList(channels) {
 
   channels.forEach(function (channel) {
     console.log(
-      `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`
+      cliTruncate(
+        `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`,
+        process.stdout.columns
+      )
     );
   });
 }

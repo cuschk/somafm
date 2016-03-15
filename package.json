@@ -34,6 +34,7 @@
   ],
   "dependencies": {
     "chalk": "^1.1.1",
+    "cli-truncate": "^0.2.0",
     "dateformat": "^1.0.11",
     "got": "^5.4.1",
     "isbin": "0.0.2",
