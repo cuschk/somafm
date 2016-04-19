@@ -43,12 +43,13 @@ function showChannelList(channels) {
   console.log();
 
   channels.forEach(function (channel) {
-    console.log(
-      cliTruncate(
-        `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`,
-        process.stdout.columns
-      )
-    );
+    var str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
+
+    if (process.stdout.columns) {
+      console.log(cliTruncate(str, process.stdout.columns));
+    } else {
+      console.log(str);
+    }
   });
 }
 
