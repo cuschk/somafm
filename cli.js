@@ -60,14 +60,13 @@ function showChannel(channel) {
 
   ${chalk.blue(channel.description)}
 
-       ${chalk.yellow('Now playing')}   ${channel.lastPlaying}
+    ${chalk.yellow('Now playing')}   ${channel.lastPlaying}
 
-                ${chalk.yellow('DJ')}   ${channel.dj}
-             ${chalk.yellow('Genre')}   ${channel.genre}
-         ${chalk.yellow('Listeners')}   ${channel.listeners}
+             ${chalk.yellow('DJ')}   ${channel.dj}
+          ${chalk.yellow('Genre')}   ${channel.genre}
+      ${chalk.yellow('Listeners')}   ${channel.listeners}
 
-        ${chalk.yellow('Stream URL')}   ${channel.stream.url}
-    ${chalk.yellow('Stream quality')}   ${channel.stream.quality} ${channel.stream.format}`
+     ${chalk.yellow('Stream URL')}   ${channel.stream.url}`
   );
 }
 
