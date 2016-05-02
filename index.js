@@ -1,9 +1,9 @@
 'use strict';
-var pkg = require('./package.json');
 var got = require('got');
 var xml2js = require('xml2js').parseString;
 var objectAssign = require('object-assign');
 var trim = require('trim');
+var pkg = require('./package.json');
 
 var preferredStreams = [
   {quality: 'highestpls', format: 'aac'},

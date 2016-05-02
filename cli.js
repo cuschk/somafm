@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 'use strict';
-var pkg = require('./package.json');
-var somafm = require('./');
+var childProcess = require('child_process');
 var chalk = require('chalk');
 var minimist = require('minimist');
-var childProcess = require('child_process');
 var isBin = require('isbin');
 var dateFormat = require('dateformat');
 var trim = require('trim');
 var termTitle = require('term-title');
 var cliTruncate = require('cli-truncate');
+var pkg = require('./package.json');
+var somafm = require('./');
 
 var options = minimist(process.argv.slice(2));
 var args = options._;

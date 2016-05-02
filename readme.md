@@ -47,13 +47,13 @@ $ somafm info groovesalad
 
   A nicely chilled plate of ambient/downtempo beats and grooves.
 
-       Now playing   Eat Static - The Wreckage
+    Now playing   Eat Static - The Wreckage
 
-                DJ   Rusty Hodge
-             Genre   ambient|electronica
-         Listeners   2895
+             DJ   Rusty Hodge
+          Genre   ambient|electronica
+      Listeners   2895
 
-        Stream URL   http://somafm.com/groovesalad130.pls
+     Stream URL   http://somafm.com/groovesalad130.pls
 ```
 
 ### `somafm play <channel>`
