@@ -6,7 +6,8 @@
   "repository": "uschek/somafm",
   "author": {
     "name": "Christoph Uschkrat",
-    "email": "c.uschkrat@gmail.com"
+    "email": "c.uschkrat@gmail.com",
+    "url": "c.uschkrat.com"
   },
   "bin": {
     "somafm": "cli.js"
