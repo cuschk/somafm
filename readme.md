@@ -9,9 +9,7 @@ Show all channels from [SomaFM](http://somafm.com) and play them using [MPlayer]
 
 You are only one command away from listening to your favourite radio stream.
 
-```
-$ somafm play fluid
-```
+![Screenshot](screenshot.png)
 
 
 ## Install
