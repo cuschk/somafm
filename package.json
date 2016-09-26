@@ -42,8 +42,7 @@
     "minimist": "^1.2.0",
     "object-assign": "^4.0.1",
     "term-title": "^1.0.0",
-    "trim": "0.0.1",
-    "xml2js": "^0.4.16"
+    "trim": "0.0.1"
   },
   "devDependencies": {
     "xo": "^0.15.0"

@@ -1,17 +1,16 @@
 'use strict';
 var got = require('got');
-var xml2js = require('xml2js').parseString;
 var objectAssign = require('object-assign');
 var trim = require('trim');
 var pkg = require('./package.json');
 
 var preferredStreams = [
-  {quality: 'highestpls', format: 'aac'},
-  {quality: 'highestpls', format: 'mp3'},
-  {quality: 'fastpls', format: 'mp3'},
-  {quality: 'fastpls', format: 'aacp'},
-  {quality: 'slowpls', format: 'aacp'},
-  {quality: 'slowpls', format: 'mp3'}
+  {quality: 'highest', format: 'aac'},
+  {quality: 'highest', format: 'mp3'},
+  {quality: 'high', format: 'mp3'},
+  {quality: 'high', format: 'aacp'},
+  {quality: 'low', format: 'aacp'},
+  {quality: 'low', format: 'mp3'}
 ];
 
 var gotOpts = {
@@ -34,48 +33,38 @@ somafm.getChannels = function (options, cb) {
 
   options.streams = objectAssign(preferredStreams, options.streams);
 
-  got('https://somafm.com/channels.xml', gotOpts, function (err, data) {
-    parseXml(err, data, options);
+  got('https://api.somafm.com/channels.json', gotOpts, function (err, data) {
+    parse(err, data, options, cb);
   });
 
-  function parseXml(err, data, options) {
+  function parse(err, res, options, cb) {
     if (err) {
       return cb(err);
     }
 
-    xml2js(data, function (err, res) {
-      parseData(err, res, options);
-    });
-  }
+    res = JSON.parse(res);
 
-  function parseData(err, res, options) {
-    if (err) {
-      return cb(err);
-    }
-
-    var jsonData = options.sortChannels ?
-      res.channels.channel.sort(compareChannelObjects) :
-      res.channels.channel;
+    var data = options.sortChannels ?
+      res.channels.sort(compareChannelObjects) :
+      res.channels;
     var channels = [];
 
     if (options.raw) {
-      return cb(null, jsonData);
+      return cb(null, data);
     }
 
-    jsonData.forEach(function (channel) {
-      var streamHighestQuality = {};
-
-      streamHighestQuality = getHighestQualityStream(channel);
+    data.forEach(function (channel) {
+      var streamHighestQuality = getHighestQualityStream(channel);
 
       var channelObj = {
-        id: channel.$.id,
-        title: channel.title[0],
-        fullTitle: 'SomaFM ' + channel.title[0],
-        description: trim(channel.description[0]),
-        dj: channel.dj[0],
-        genre: channel.genre[0].replace(/\|/g, '/'),
-        lastPlaying: channel.lastPlaying[0],
-        listeners: channel.listeners[0],
+        id: channel.id,
+        title: channel.title,
+        fullTitle: 'SomaFM ' + channel.title,
+        description: trim(channel.description),
+        dj: channel.dj,
+        genre: channel.genre.replace(/\|/g, '/'),
+        lastPlaying: channel.lastPlaying,
+        listeners: channel.listeners,
         stream: streamHighestQuality
       };
       channels.push(channelObj);
@@ -85,26 +74,22 @@ somafm.getChannels = function (options, cb) {
   }
 
   function compareChannelObjects(a, b) {
-    return a.title[0].toLowerCase().localeCompare(b.title[0].toLowerCase());
+    return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
   }
 
   function getHighestQualityStream(channel) {
     for (var i = 0; i < options.streams.length; i++) {
       var stream = options.streams[i];
 
-      if (channel[stream.quality]) {
-        for (var j = 0; j < channel[stream.quality].length; j++) {
-          var format = channel[stream.quality][j];
+      for (var j = 0; j < channel.playlists.length; j++) {
+        if (channel.playlists[j].quality === stream.quality && channel.playlists[j].format === stream.format) {
+          var res = {
+            url: channel.playlists[j].url,
+            format: channel.playlists[j].format,
+            quality: channel.playlists[j].quality
+          };
 
-          if (format.$.format === stream.format) {
-            var res = {
-              url: format._,
-              format: format.$.format,
-              quality: stream.quality
-            };
-
-            return res;
-          }
+          return res;
         }
       }
     }
