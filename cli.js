@@ -107,7 +107,24 @@ function play(channel, cb) {
     '-playlist',
     channel.stream.url
   ];
-  var mplayerProc = childProcess.spawn(mplayerBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
+  var mplayerProc = childProcess.spawn(mplayerBin, args);
+
+  var stdin = process.stdin;
+  stdin.setRawMode(true);
+  stdin.resume();
+  stdin.setEncoding('utf-8');
+
+  stdin.on('data', function (key) {
+    if (['m', '9', '0'].indexOf(key) > -1) {
+      mplayerProc.stdin.write(key);
+    }
+
+    // ctrl+c
+    if (key === '\u0003' || key === 'q') {
+      mplayerProc.kill();
+      process.exit();
+    }
+  });
 
   mplayerProc.stdout.on('data', function (data) {
     var line = data.toString();
@@ -129,13 +146,11 @@ function play(channel, cb) {
 
   mplayerProc.on('error', function (err) {
     cb(err);
-    return;
   });
 
   mplayerProc.on('exit', function () {
     termTitle();
     cb(null);
-    return;
   });
 }
 
@@ -256,10 +271,5 @@ function init(args, options) {
   showHelp();
   process.exit(1);
 }
-
-process.on('SIGINT', function () {
-  termTitle();
-  process.exit();
-});
 
 init(args, options);
