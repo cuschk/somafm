@@ -8,6 +8,7 @@ var dateFormat = require('dateformat');
 var trim = require('trim');
 var termTitle = require('term-title');
 var cliTruncate = require('cli-truncate');
+var copy = require('copy-paste').copy;
 var pkg = require('./package.json');
 var somafm = require('./');
 
@@ -100,6 +101,8 @@ function play(channel, cb) {
     return;
   }
 
+  var currentTitle;
+
   console.log(`\n  Playing ${chalk.bold(channel.fullTitle)}\n`);
 
   var args = [
@@ -117,6 +120,10 @@ function play(channel, cb) {
   stdin.on('data', function (key) {
     if (['m', '9', '0'].indexOf(key) > -1) {
       mplayerProc.stdin.write(key);
+    }
+
+    if (key === 'c') {
+      copy(currentTitle);
     }
 
     // ctrl+c
@@ -141,6 +148,8 @@ function play(channel, cb) {
 
       console.log(`  ${chalk.yellow(time)}  ${titleOut}`);
       termTitle(titleHead);
+
+      currentTitle = title;
     }
   });
 

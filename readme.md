@@ -70,6 +70,8 @@ $ somafm play secretagent
   23:28:23  Tape Five - Longitude 54-21
 ```
 
+*Bonus: You can copy the currently playing song title to the clipboard by hitting <kbd>c</kbd>.*
+
 ### `somafm record <channel>`
 
 Record a channel. Requires [Streamripper](http://streamripper.sourceforge.net).
