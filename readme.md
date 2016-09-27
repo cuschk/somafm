@@ -1,6 +1,6 @@
 # SomaFM
 
-> List, play, and record SomaFM radio channels.
+> Play & record SomaFM radio channels.
 
 Show all channels from [SomaFM](http://somafm.com) and play them using [MPlayer](https://mplayerhq.hu).
 
