@@ -176,7 +176,7 @@ function record(channel, cb) {
   ];
   var streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
   var currentStatus;
-  var currentSong;
+  var currentTitle;
 
   console.log(`
   Recording ${chalk.bold(channel.fullTitle)}
@@ -190,30 +190,28 @@ function record(channel, cb) {
     var res = line.match(regex);
 
     if (res && res[1] && res[2]) {
-      if ((currentStatus !== res[1] || currentSong !== res[2]) && res[2].length > 1) {
+      if ((currentStatus !== res[1] || currentTitle !== res[2]) && res[2].length > 1) {
         if (res[3] && trim(res[3]) === '0b') {
           return;
         }
 
         currentStatus = res[1];
-        currentSong = res[2];
+        currentTitle = res[2];
 
         var time = dateFormat(new Date(), 'HH:MM:ss');
         var status = res[1] === 'r' ? 'Recording' : 'Skipping ';
-        console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentSong}`);
+        console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
       }
     }
   });
 
   streamripperProc.on('error', function (err) {
     cb(err);
-    return;
   });
 
   streamripperProc.on('exit', function () {
     console.log('Streamripper exited.');
     cb(null);
-    return;
   });
 }
 
