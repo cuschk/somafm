@@ -1,7 +1,7 @@
 {
   "name": "somafm",
   "version": "1.2.0",
-  "description": "List, play, and record SomaFM radio channels.",
+  "description": "Play & record SomaFM radio channels.",
   "license": "MIT",
   "repository": "uschek/somafm",
   "author": {
