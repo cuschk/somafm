@@ -101,7 +101,7 @@ function play(channel, cb) {
     return;
   }
 
-  var currentTitle;
+  var currentTitle = '';
 
   console.log(`\n  Playing ${chalk.bold(channel.fullTitle)}\n`);
 
