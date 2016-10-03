@@ -1,6 +1,5 @@
 'use strict';
 const got = require('got');
-const objectAssign = require('object-assign');
 const trim = require('trim');
 const pkg = require('./package.json');
 
@@ -29,9 +28,9 @@ somafm.getChannels = (options, cb) => {
     options = {};
   }
 
-  options = objectAssign({}, options);
+  options = Object.assign({}, options);
 
-  options.streams = objectAssign(preferredStreams, options.streams);
+  options.streams = Object.assign(preferredStreams, options.streams);
 
   got('https://api.somafm.com/channels.json', gotOpts, (err, data) => {
     parse(err, data, options, cb);

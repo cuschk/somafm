@@ -42,7 +42,6 @@
     "got": "^5.4.1",
     "isbin": "0.0.2",
     "minimist": "^1.2.0",
-    "object-assign": "^4.0.1",
     "term-title": "^1.0.0",
     "trim": "0.0.1"
   },
