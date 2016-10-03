@@ -1,23 +1,23 @@
 #!/usr/bin/env node
 'use strict';
-var childProcess = require('child_process');
-var chalk = require('chalk');
-var minimist = require('minimist');
-var isBin = require('isbin');
-var dateFormat = require('dateformat');
-var trim = require('trim');
-var termTitle = require('term-title');
-var cliTruncate = require('cli-truncate');
-var copy = require('copy-paste').copy;
-var pkg = require('./package.json');
-var somafm = require('./');
+const childProcess = require('child_process');
+const chalk = require('chalk');
+const minimist = require('minimist');
+const isBin = require('isbin');
+const dateFormat = require('dateformat');
+const trim = require('trim');
+const termTitle = require('term-title');
+const cliTruncate = require('cli-truncate');
+const copy = require('copy-paste').copy;
+const pkg = require('./package.json');
+const somafm = require('./');
 
-var options = minimist(process.argv.slice(2));
-var args = options._;
+const options = minimist(process.argv.slice(2));
+const args = options._;
 delete options._;
 
-var mplayerBin = 'mplayer';
-var streamripperBin = 'streamripper';
+const mplayerBin = 'mplayer';
+const streamripperBin = 'streamripper';
 
 function showHelp() {
   console.log(
@@ -43,8 +43,8 @@ function showHelp() {
 function showChannelList(channels) {
   console.log();
 
-  channels.forEach(function (channel) {
-    var str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
+  channels.forEach(channel => {
+    const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
 
     if (process.stdout.columns) {
       console.log(cliTruncate(str, process.stdout.columns));
@@ -72,20 +72,18 @@ function showChannel(channel) {
 }
 
 function list() {
-  somafm.getChannels({sortChannels: true},
-    function (err, res) {
-      if (err) {
-        console.error(err.toString());
-        process.exit(20);
-      }
-
-      showChannelList(res);
+  somafm.getChannels({sortChannels: true}, (err, res) => {
+    if (err) {
+      console.error(err.toString());
+      process.exit(20);
     }
-  );
+
+    showChannelList(res);
+  });
 }
 
 function info() {
-  somafm.getChannel(args[1], function (err, channel) {
+  somafm.getChannel(args[1], (err, channel) => {
     if (err) {
       console.error(err.toString());
       process.exit(10);
@@ -101,23 +99,23 @@ function play(channel, cb) {
     return;
   }
 
-  var currentTitle = '';
+  let currentTitle = '';
 
   console.log(`\n  Playing ${chalk.bold(channel.fullTitle)}\n`);
 
-  var args = [
+  const args = [
     '-quiet',
     '-playlist',
     channel.stream.url
   ];
-  var mplayerProc = childProcess.spawn(mplayerBin, args);
+  const mplayerProc = childProcess.spawn(mplayerBin, args);
 
-  var stdin = process.stdin;
+  const stdin = process.stdin;
   stdin.setRawMode(true);
   stdin.resume();
   stdin.setEncoding('utf-8');
 
-  stdin.on('data', function (key) {
+  stdin.on('data', key => {
     if (['m', '9', '0'].indexOf(key) > -1) {
       mplayerProc.stdin.write(key);
     }
@@ -133,18 +131,18 @@ function play(channel, cb) {
     }
   });
 
-  mplayerProc.stdout.on('data', function (data) {
-    var line = data.toString();
+  mplayerProc.stdout.on('data', data => {
+    const line = data.toString();
 
-    var regex = /StreamTitle='(.*)';StreamUrl=/;
-    var res = line.match(regex);
-    var title;
+    const regex = /StreamTitle='(.*)';StreamUrl=/;
+    const res = line.match(regex);
+    let title;
 
     if (res && (title = res[1])) {
-      var time = dateFormat(new Date(), 'HH:MM:ss');
+      const time = dateFormat(new Date(), 'HH:MM:ss');
 
-      var titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? `>> ${title}` : title;
-      var titleHead = `▶ ${title}`;
+      const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? `>> ${title}` : title;
+      const titleHead = `▶ ${title}`;
 
       console.log(`  ${chalk.yellow(time)}  ${titleOut}`);
       termTitle(titleHead);
@@ -153,11 +151,11 @@ function play(channel, cb) {
     }
   });
 
-  mplayerProc.on('error', function (err) {
+  mplayerProc.on('error', err => {
     cb(err);
   });
 
-  mplayerProc.on('exit', function () {
+  mplayerProc.on('exit', () => {
     termTitle();
     cb(null);
   });
@@ -169,25 +167,25 @@ function record(channel, cb) {
     return;
   }
 
-  var date = dateFormat(new Date(), 'yyyymmdd_HHMMss');
-  var args = [
+  const date = dateFormat(new Date(), 'yyyymmdd_HHMMss');
+  const args = [
     channel.stream.url,
     '-D', `${channel.fullTitle}/${date}/%1q %A - %T`
   ];
-  var streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
-  var currentStatus;
-  var currentTitle;
+  const streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
+  let currentStatus;
+  let currentTitle;
 
   console.log(`
   Recording ${chalk.bold(channel.fullTitle)}
   to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
   );
 
-  streamripperProc.stdout.on('data', function (data) {
-    var line = data.toString();
+  streamripperProc.stdout.on('data', data => {
+    const line = data.toString();
 
-    var regex = /^\[(r|sk)ipping.*\] (.*) \[(.{7})\]$/m;
-    var res = line.match(regex);
+    const regex = /^\[(r|sk)ipping.*\] (.*) \[(.{7})\]$/m;
+    const res = line.match(regex);
 
     if (res && res[1] && res[2]) {
       if ((currentStatus !== res[1] || currentTitle !== res[2]) && res[2].length > 1) {
@@ -198,18 +196,18 @@ function record(channel, cb) {
         currentStatus = res[1];
         currentTitle = res[2];
 
-        var time = dateFormat(new Date(), 'HH:MM:ss');
-        var status = res[1] === 'r' ? 'Recording' : 'Skipping ';
+        const time = dateFormat(new Date(), 'HH:MM:ss');
+        const status = res[1] === 'r' ? 'Recording' : 'Skipping ';
         console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
       }
     }
   });
 
-  streamripperProc.on('error', function (err) {
+  streamripperProc.on('error', err => {
     cb(err);
   });
 
-  streamripperProc.on('exit', function () {
+  streamripperProc.on('exit', () => {
     console.log('Streamripper exited.');
     cb(null);
   });
@@ -242,13 +240,13 @@ function init(args, options) {
   }
 
   if (args.indexOf('play') === 0 && args[1]) {
-    somafm.getChannel(args[1], function (err, channel) {
+    somafm.getChannel(args[1], (err, channel) => {
       if (err) {
         console.error(err.toString());
         process.exit(10);
       }
 
-      play(channel, function (err) {
+      play(channel, err => {
         if (err) {
           console.error(err.toString());
           process.exit(30);
@@ -259,13 +257,13 @@ function init(args, options) {
   }
 
   if (args.indexOf('record') === 0 && args[1]) {
-    somafm.getChannel(args[1], function (err, channel) {
+    somafm.getChannel(args[1], (err, channel) => {
       if (err) {
         console.error(err.toString());
         process.exit(10);
       }
 
-      record(channel, function (err) {
+      record(channel, err => {
         if (err) {
           console.error(err.toString());
           process.exit(40);
