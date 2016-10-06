@@ -32,15 +32,15 @@ somafm.getChannels = (options, cb) => {
 
   options.streams = Object.assign(preferredStreams, options.streams);
 
-  got('https://api.somafm.com/channels.json', gotOpts, (err, data) => {
-    parse(err, data, options, cb);
-  });
+  got('https://api.somafm.com/channels.json', gotOpts)
+    .then(res => {
+      parse(res.body, options, cb);
+    })
+    .catch(err => {
+      cb(err);
+    });
 
-  function parse(err, res, options, cb) {
-    if (err) {
-      return cb(err);
-    }
-
+  function parse(res, options, cb) {
     res = JSON.parse(res);
 
     const data = options.sortChannels ?
