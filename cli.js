@@ -9,6 +9,8 @@ const trim = require('trim');
 const termTitle = require('term-title');
 const cliTruncate = require('cli-truncate');
 const copy = require('copy-paste').copy;
+const logUpdate = require('log-update');
+const utils = require('./utils');
 const pkg = require('./package.json');
 const somafm = require('./');
 
@@ -100,8 +102,10 @@ function play(channel, cb) {
   }
 
   let currentTitle = '';
+  let currentTitleOut;
+  let currentTime;
 
-  console.log(`\n  Playing ${chalk.bold(channel.fullTitle)}\n`);
+  console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
 
   const args = [
     '-quiet',
@@ -124,6 +128,21 @@ function play(channel, cb) {
       copy(currentTitle);
     }
 
+    if (key === '+') {
+      utils.addToFavourites(currentTitle);
+      logTitle(currentTime, currentTitleOut, true);
+    }
+
+    if (key === '-') {
+      utils.removeFromFavourites(currentTitle);
+      logTitle(currentTime, currentTitleOut);
+    }
+
+    if (key === 'f') {
+      utils.toggleFavourite(currentTitle);
+      logTitle(currentTime, currentTitleOut, utils.isFavourite(currentTitle));
+    }
+
     // ctrl+c
     if (key === '\u0003' || key === 'q') {
       mplayerProc.kill();
@@ -141,13 +160,16 @@ function play(channel, cb) {
     if (res && (title = res[1])) {
       const time = dateFormat(new Date(), 'HH:MM:ss');
 
-      const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? `>> ${title}` : title;
+      const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
       const titleHead = `▶ ${title}`;
 
-      console.log(`  ${chalk.yellow(time)}  ${titleOut}`);
-      termTitle(titleHead);
-
       currentTitle = title;
+      currentTime = chalk.yellow(time);
+      currentTitleOut = titleOut;
+
+      logUpdate.done();
+      logTitle(currentTime, currentTitleOut, utils.isFavourite(currentTitle));
+      termTitle(titleHead);
     }
   });
 
@@ -159,6 +181,10 @@ function play(channel, cb) {
     termTitle();
     cb(null);
   });
+}
+
+function logTitle(time, title, isFavourite) {
+  logUpdate(`  ${time}  ${isFavourite ? chalk.red('❤') + ' ' : ''}${title}`);
 }
 
 function record(channel, cb) {
