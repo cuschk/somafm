@@ -56,4 +56,14 @@ utils.toggleFavourite = title => {
   writeFavourites();
 };
 
+utils.getFavourites = cb => {
+  readFavourites();
+
+  return cb(favourites);
+};
+
+utils.getFavouritesFile = () => {
+  return conf.path;
+};
+
 module.exports = utils;

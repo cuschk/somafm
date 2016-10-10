@@ -10,6 +10,7 @@ const termTitle = require('term-title');
 const cliTruncate = require('cli-truncate');
 const copy = require('copy-paste').copy;
 const logUpdate = require('log-update');
+const editor = require('editor');
 const utils = require('./utils');
 const pkg = require('./package.json');
 const somafm = require('./');
@@ -34,6 +35,8 @@ function showHelp() {
     info <channel>      show channel information
     play <channel>      play channel
     record <channel>    start recording channel
+    list-favourites     list your favourite songs
+    edit-favourites     edit your favourite songs
 
   Examples
     somafm list
@@ -104,6 +107,7 @@ function play(channel, cb) {
   let currentTitle = '';
   let currentTitleOut;
   let currentTime;
+  let currentFavourite;
 
   console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
 
@@ -130,17 +134,24 @@ function play(channel, cb) {
 
     if (key === '+') {
       utils.addToFavourites(currentTitle);
+
       logTitle(currentTime, currentTitleOut, true);
+      windowTitle(currentTitleOut, true);
     }
 
     if (key === '-') {
       utils.removeFromFavourites(currentTitle);
+
       logTitle(currentTime, currentTitleOut);
+      windowTitle(currentTitleOut);
     }
 
     if (key === 'f') {
       utils.toggleFavourite(currentTitle);
-      logTitle(currentTime, currentTitleOut, utils.isFavourite(currentTitle));
+      currentFavourite = utils.isFavourite(currentTitle);
+
+      logTitle(currentTime, currentTitleOut, currentFavourite);
+      windowTitle(currentTitleOut, currentFavourite);
     }
 
     // ctrl+c
@@ -159,17 +170,17 @@ function play(channel, cb) {
 
     if (res && (title = res[1])) {
       const time = dateFormat(new Date(), 'HH:MM:ss');
-
       const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
-      const titleHead = `▶ ${title}`;
 
       currentTitle = title;
       currentTime = chalk.yellow(time);
       currentTitleOut = titleOut;
 
+      currentFavourite = utils.isFavourite(currentTitle);
+
       logUpdate.done();
-      logTitle(currentTime, currentTitleOut, utils.isFavourite(currentTitle));
-      termTitle(titleHead);
+      logTitle(currentTime, currentTitleOut, currentFavourite);
+      windowTitle(currentTitle, currentFavourite);
     }
   });
 
@@ -183,8 +194,12 @@ function play(channel, cb) {
   });
 }
 
-function logTitle(time, title, isFavourite) {
-  logUpdate(`  ${time}  ${isFavourite ? chalk.red('❤') + ' ' : ''}${title}`);
+function logTitle(time, title, favourite) {
+  logUpdate(`  ${time}  ${favourite ? chalk.red('❤') + ' ' : ''}${title}`);
+}
+
+function windowTitle(title, favourite) {
+  termTitle(`${favourite ? '❤' : '▶'} ${title}`);
 }
 
 function record(channel, cb) {
@@ -296,6 +311,21 @@ function init(args, options) {
         }
       });
     });
+    return;
+  }
+
+  if (args.indexOf('list-favourites') === 0 || args.indexOf('list-favorites') === 0) {
+    utils.getFavourites(favourites => {
+      console.log();
+      favourites.forEach(title => {
+        console.log(`  ${chalk.red('❤')} ${title}`);
+      });
+    });
+    return;
+  }
+
+  if (args.indexOf('edit-favourites') === 0 || args.indexOf('edit-favorites') === 0) {
+    editor(utils.getFavouritesFile());
     return;
   }
 
