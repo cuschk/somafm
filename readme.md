@@ -1,13 +1,8 @@
 # SomaFM
 
-> Play & record SomaFM radio channels
+> Play & record [SomaFM](https://somafm.com) radio channels
 
-
-## tl;dr
-
-You are only one command away from listening to your favourite radio stream.
-
-![Screenshot](screenshot.png)
+![](screenshot.png)
 
 
 ## Install
@@ -21,7 +16,7 @@ $ npm install --global somafm
 
 ### `somafm list`
 
-List all SomaFM channels.
+List all [SomaFM channels](https://somafm.com/listen/).
 
 ```
 $ somafm list
@@ -68,7 +63,13 @@ $ somafm play secretagent
   23:28:23  Tape Five - Longitude 54-21
 ```
 
-*Bonus: You can copy the currently playing song title to the clipboard by hitting <kbd>c</kbd>.*
+#### Keyboard shortcuts
+
+Description                          | Key
+------------------------------------ | ------------
+Copy current song title to clipboard | <kbd>c</kbd>
+Add current song to favourites       | <kbd>+</kbd>
+Remove current song from favourites  | <kbd>-</kbd>
 
 ### `somafm record <channel>`
 
@@ -84,6 +85,22 @@ $ somafm record fluid
   22:54:35  Recording  Shlohmo - Rained the Whole Time
   22:59:55  Recording  Koreless - Lost in Tokyo
 ```
+
+### `somafm list-favourites`
+
+List your favourite songs.
+
+```
+$ somafm list-favourites
+
+  ❤ Mount Kimbie - Adriatic
+  ❤ Bonobo - All in Forms
+```
+
+### `somafm edit-favourites`
+
+Edit your favourites songs file.
+
 
 ## License
 
