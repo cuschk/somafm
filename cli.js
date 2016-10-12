@@ -152,6 +152,9 @@ function play(channel, cb) {
 
     // ctrl+c, esc
     if (key === '\u0003' || key === '\u001b' || key === 'q') {
+      logTitle(currentTime, currentTitleOut, currentFavourite);
+      logUpdate.done();
+
       mplayerProc.kill();
       process.exit();
     }
