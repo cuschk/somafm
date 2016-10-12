@@ -25,10 +25,14 @@ Play a channel. Requires [MPlayer](https://mplayerhq.hu). Please make sure you h
 #### Keyboard shortcuts
 
 Description                          | Key
------------------------------------- | ------------
+------------------------------------ | ------------------------------
 Copy current song title to clipboard | <kbd>c</kbd>
-Add current song to favourites       | <kbd>+</kbd>
-Remove current song from favourites  | <kbd>-</kbd>
+Add current song to favourites       | <kbd>f</kbd> or <kbd>+</kbd>
+Remove current song from favourites  | <kbd>u</kbd> or <kbd>-</kbd>
+Increase volume                      | <kbd>*</kbd> or <kbd>0</kbd>
+Decrease volume                      | <kbd>/</kbd> or <kbd>9</kbd>
+Mute/unmute                          | <kbd>m</kbd>
+Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
 
 ### `somafm info <channel>`
 

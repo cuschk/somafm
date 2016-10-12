@@ -124,7 +124,7 @@ function play(channel, cb) {
   stdin.setEncoding('utf-8');
 
   stdin.on('data', key => {
-    if (['m', '9', '0'].indexOf(key) > -1) {
+    if (['m', '9', '0', '/', '*'].indexOf(key) > -1) {
       mplayerProc.stdin.write(key);
     }
 
@@ -146,8 +146,8 @@ function play(channel, cb) {
       windowTitle(currentTitleOut);
     }
 
-    // ctrl+c
-    if (key === '\u0003' || key === 'q') {
+    // ctrl+c, esc
+    if (key === '\u0003' || key === '\u001b' || key === 'q') {
       mplayerProc.kill();
       process.exit();
     }
