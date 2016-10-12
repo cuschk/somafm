@@ -10,6 +10,7 @@ const termTitle = require('term-title');
 const cliTruncate = require('cli-truncate');
 const copy = require('copy-paste').copy;
 const logUpdate = require('log-update');
+const cliCursor = require('cli-cursor');
 const editor = require('editor');
 const utils = require('./utils');
 const pkg = require('./package.json');
@@ -109,6 +110,7 @@ function play(channel, cb) {
   let currentTime;
   let currentFavourite;
 
+  cliCursor.hide();
   console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
 
   const args = [
@@ -134,15 +136,17 @@ function play(channel, cb) {
 
     if (key === 'f' || key === '+') {
       utils.addToFavourites(currentTitle);
+      currentFavourite = true;
 
-      logTitle(currentTime, currentTitleOut, true);
+      logTitle(currentTime, currentTitleOut, true, true);
       windowTitle(currentTitleOut, true);
     }
 
     if (key === 'u' || key === '-') {
       utils.removeFromFavourites(currentTitle);
+      currentFavourite = false;
 
-      logTitle(currentTime, currentTitleOut);
+      logTitle(currentTime, currentTitleOut, false, true);
       windowTitle(currentTitleOut);
     }
 
@@ -164,6 +168,11 @@ function play(channel, cb) {
       const time = dateFormat(new Date(), 'HH:MM:ss');
       const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
 
+      // overwrite last line
+      if (currentTime) {
+        logTitle(currentTime, currentTitleOut, currentFavourite);
+      }
+
       currentTitle = title;
       currentTime = chalk.yellow(time);
       currentTitleOut = titleOut;
@@ -171,7 +180,7 @@ function play(channel, cb) {
       currentFavourite = utils.isFavourite(currentTitle);
 
       logUpdate.done();
-      logTitle(currentTime, currentTitleOut, currentFavourite);
+      logTitle(currentTime, currentTitleOut, currentFavourite, true);
       windowTitle(currentTitle, currentFavourite);
     }
   });
@@ -186,8 +195,30 @@ function play(channel, cb) {
   });
 }
 
-function logTitle(time, title, favourite) {
-  logUpdate(`  ${time}  ${favourite ? chalk.red('❤') + ' ' : ''}${title}`);
+function logTitle(time, title, favourite, playing) {
+  let state = 0;
+  let prefix = '';
+
+  if (favourite) {
+    state++;
+  }
+  if (playing) {
+    state += 2;
+  }
+
+  switch (state) {
+    case 1:
+      prefix = `${chalk.red('❤')} `;
+      break;
+    case 2:
+      prefix = `${chalk.green('▶')} `;
+      break;
+    case 3:
+      prefix = `${chalk.green('❤')} `;
+      break;
+  }
+
+  logUpdate(`  ${time}  ${prefix}${title}`);
 }
 
 function windowTitle(title, favourite) {
@@ -209,6 +240,7 @@ function record(channel, cb) {
   let currentStatus;
   let currentTitle;
 
+  cliCursor.hide();
   console.log(`
   Recording ${chalk.bold(channel.fullTitle)}
   to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
