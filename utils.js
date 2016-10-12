@@ -46,16 +46,6 @@ utils.removeFromFavourites = title => {
   writeFavourites();
 };
 
-utils.toggleFavourite = title => {
-  if (utils.isFavourite(title)) {
-    removeItem(title);
-  } else {
-    addItem(title);
-  }
-
-  writeFavourites();
-};
-
 utils.getFavourites = cb => {
   readFavourites();
 

@@ -132,26 +132,18 @@ function play(channel, cb) {
       copy(currentTitle);
     }
 
-    if (key === '+') {
+    if (key === 'f' || key === '+') {
       utils.addToFavourites(currentTitle);
 
       logTitle(currentTime, currentTitleOut, true);
       windowTitle(currentTitleOut, true);
     }
 
-    if (key === '-') {
+    if (key === 'u' || key === '-') {
       utils.removeFromFavourites(currentTitle);
 
       logTitle(currentTime, currentTitleOut);
       windowTitle(currentTitleOut);
-    }
-
-    if (key === 'f') {
-      utils.toggleFavourite(currentTitle);
-      currentFavourite = utils.isFavourite(currentTitle);
-
-      logTitle(currentTime, currentTitleOut, currentFavourite);
-      windowTitle(currentTitleOut, currentFavourite);
     }
 
     // ctrl+c
