@@ -216,6 +216,7 @@ function logTitle(time, title, favourite, playing) {
     case 3:
       prefix = `${chalk.green('❤')} `;
       break;
+    default:
   }
 
   logUpdate(`  ${time}  ${prefix}${title}`);
