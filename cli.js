@@ -77,8 +77,8 @@ function showChannel(channel) {
   );
 }
 
-function list() {
-  somafm.getChannels({sortChannels: true}, (err, res) => {
+function list(filter) {
+  somafm.getChannels({filter, sortChannels: true}, (err, res) => {
     if (err) {
       console.error(err.toString());
       process.exit(20);
@@ -299,7 +299,7 @@ function init(args, options) {
   }
 
   if (args.indexOf('list') === 0) {
-    list();
+    list(args.slice(1));
     return;
   }
 

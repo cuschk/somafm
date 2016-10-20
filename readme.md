@@ -14,9 +14,9 @@ $ npm install --global somafm
 
 ## Usage
 
-### `somafm list`
+### `somafm list [<filter>]`
 
-List all [SomaFM channels](https://somafm.com/listen/).
+List [SomaFM channels](https://somafm.com/listen/). You can filter by one or more keywords.
 
 ### `somafm play <channel>`
 

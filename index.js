@@ -46,7 +46,7 @@ somafm.getChannels = (options, cb) => {
     const data = options.sortChannels ?
       res.channels.sort(compareChannelObjects) :
       res.channels;
-    const channels = [];
+    let channels = [];
 
     if (options.raw) {
       return cb(null, data);
@@ -68,6 +68,10 @@ somafm.getChannels = (options, cb) => {
       };
       channels.push(channelObj);
     });
+
+    if (options.filter && options.filter.length) {
+      channels = filterChannels(channels, options.filter);
+    }
 
     return cb(null, channels);
   }
@@ -94,6 +98,20 @@ somafm.getChannels = (options, cb) => {
     }
 
     return null;
+  }
+
+  function filterChannels(channels, filter) {
+    return channels.filter(channel => {
+      for (let i = 0; i < filter.length; i++) {
+        const regex = new RegExp(filter[i], 'i');
+
+        if (!channel.title.match(regex) && !channel.description.match(regex) && !channel.genre.match(regex) && !channel.dj.match(regex)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
   }
 };
 
