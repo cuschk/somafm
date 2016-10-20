@@ -32,7 +32,7 @@ function showHelp() {
     somafm <command> [<channel>]
 
   Commands
-    list                list channels
+    list [<search>]     list channels, optionally filter
     info <channel>      show channel information
     play <channel>      play channel
     record <channel>    start recording channel
@@ -41,6 +41,7 @@ function showHelp() {
 
   Examples
     somafm list
+    somafm list ambient
     somafm info groovesalad
     somafm play fluid`
   );
@@ -77,8 +78,8 @@ function showChannel(channel) {
   );
 }
 
-function list(filter) {
-  somafm.getChannels({filter, sortChannels: true}, (err, res) => {
+function list(search) {
+  somafm.getChannels({search, sortChannels: true}, (err, res) => {
     if (err) {
       console.error(err.toString());
       process.exit(20);
