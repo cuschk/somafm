@@ -51,6 +51,20 @@ List your favourite songs.
 Edit your favourites songs file.
 
 
+## Command aliases
+
+All commands have short aliases for faster typing.
+
+Command           | Alias
+----------------- | -----
+`list`            | `l`
+`play`            | `p`
+`info`            | `i`
+`record`          | `r`
+`list-favourites` | `lf`
+`edit-favourites` | `ef`
+
+
 ## License
 
 MIT © [Christoph Uschkrat](https://c.uschkrat.com)
