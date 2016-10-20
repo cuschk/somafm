@@ -298,17 +298,17 @@ function init(args, options) {
     process.exit(1);
   }
 
-  if (args.indexOf('list') === 0 || args.indexOf('l') === 0) {
+  if (['list', 'l'].indexOf(args[0]) > -1) {
     list(args.slice(1));
     return;
   }
 
-  if ((args.indexOf('info') === 0 || args.indexOf('i') === 0) && args[1]) {
+  if (['info', 'i'].indexOf(args[0]) > -1 && args[1]) {
     info();
     return;
   }
 
-  if ((args.indexOf('play') === 0 || args.indexOf('p') === 0) && args[1]) {
+  if (['play', 'p'].indexOf(args[0]) > -1 && args[1]) {
     somafm.getChannel(args[1], (err, channel) => {
       if (err) {
         console.error(err.toString());
@@ -325,7 +325,7 @@ function init(args, options) {
     return;
   }
 
-  if ((args.indexOf('record') === 0 || args.indexOf('r') === 0) && args[1]) {
+  if (['record', 'r'].indexOf(args[0]) > -1 && args[1]) {
     somafm.getChannel(args[1], (err, channel) => {
       if (err) {
         console.error(err.toString());
@@ -342,7 +342,7 @@ function init(args, options) {
     return;
   }
 
-  if (args.indexOf('list-favourites') === 0 || args.indexOf('list-favorites') === 0 || args.indexOf('lf') === 0) {
+  if (['list-favourites', 'list-favorites', 'lf'].indexOf(args[0]) > -1) {
     utils.getFavourites(favourites => {
       console.log();
       favourites.forEach(title => {
@@ -352,7 +352,7 @@ function init(args, options) {
     return;
   }
 
-  if (args.indexOf('edit-favourites') === 0 || args.indexOf('edit-favorites') === 0 || args.indexOf('ef') === 0) {
+  if (['edit-favourites', 'edit-favorites', 'ef'].indexOf(args[0]) > -1) {
     editor(utils.getFavouritesFile());
     return;
   }
