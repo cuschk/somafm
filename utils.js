@@ -1,18 +1,17 @@
 'use strict';
-const Configstore = require('configstore');
+const Conf = require('conf');
 const arrayUnion = require('array-union');
-const pkg = require('./package.json');
 
-const conf = new Configstore(pkg.name, {favourites: []});
+const favouritesConf = new Conf({configName: 'favourites'});
 
 const utils = {};
 let favourites;
 
-const addItem = title => {
+const addFavouriteItem = title => {
   favourites = arrayUnion(favourites, [title]);
 };
 
-const removeItem = title => {
+const removeFavouriteItem = title => {
   if (utils.isFavourite(title)) {
     const index = favourites.findIndex(x => x === title);
     if (index > -1) {
@@ -22,11 +21,11 @@ const removeItem = title => {
 };
 
 const readFavourites = () => {
-  favourites = conf.get('favourites');
+  favourites = favouritesConf.get('favourites') || [];
 };
 
 const writeFavourites = () => {
-  conf.set('favourites', favourites);
+  favouritesConf.set('favourites', favourites);
 };
 
 utils.isFavourite = title => {
@@ -36,13 +35,13 @@ utils.isFavourite = title => {
 
 utils.addToFavourites = title => {
   readFavourites();
-  addItem(title);
+  addFavouriteItem(title);
   writeFavourites();
 };
 
 utils.removeFromFavourites = title => {
   readFavourites();
-  removeItem(title);
+  removeFavouriteItem(title);
   writeFavourites();
 };
 
@@ -53,7 +52,7 @@ utils.getFavourites = cb => {
 };
 
 utils.getFavouritesFile = () => {
-  return conf.path;
+  return favouritesConf.path;
 };
 
 module.exports = utils;
