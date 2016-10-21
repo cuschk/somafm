@@ -101,11 +101,14 @@ somafm.getChannels = (options, cb) => {
   }
 
   function filterChannels(channels, search) {
-    return channels.filter(channel => {
-      for (let i = 0; i < search.length; i++) {
-        const regex = new RegExp(search[i], 'i');
+    const regexes = [];
+    for (let i = 0; i < search.length; i++) {
+      regexes.push(new RegExp(search[i]));
+    }
 
-        if (!channel.title.match(regex) && !channel.description.match(regex) && !channel.genre.match(regex) && !channel.dj.match(regex)) {
+    return channels.filter(channel => {
+      for (let i = 0; i < regexes.length; i++) {
+        if (!channel.title.match(regexes[i]) && !channel.description.match(regexes[i]) && !channel.genre.match(regexes[i]) && !channel.dj.match(regexes[i])) {
           return false;
         }
       }
