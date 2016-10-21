@@ -69,7 +69,7 @@ somafm.getChannels = (options, cb) => {
       channels.push(channelObj);
     });
 
-    if (options.search && options.search.length) {
+    if (options.search && options.search.length > 0) {
       channels = filterChannels(channels, options.search);
     }
 

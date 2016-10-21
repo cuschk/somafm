@@ -54,7 +54,7 @@
     "trim": "0.0.1"
   },
   "devDependencies": {
-    "xo": "^0.16.0"
+    "xo": "^0.17.0"
   },
   "xo": {
     "space": true,
