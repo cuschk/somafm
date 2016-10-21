@@ -7,52 +7,58 @@ const favouritesConf = new Conf({configName: 'favourites'});
 const utils = {};
 let favourites;
 
-const addFavouriteItem = title => {
+function addFavouriteItem(title) {
   favourites = arrayUnion(favourites, [title]);
-};
+}
 
-const removeFavouriteItem = title => {
-  if (utils.isFavourite(title)) {
+function removeFavouriteItem(title) {
+  if (isFavourite(title)) {
     const index = favourites.findIndex(x => x === title);
     if (index > -1) {
       favourites.splice(index, 1);
     }
   }
-};
+}
 
-const readFavourites = () => {
+function readFavourites() {
   favourites = favouritesConf.get('favourites') || [];
-};
+}
 
-const writeFavourites = () => {
+function writeFavourites() {
   favouritesConf.set('favourites', favourites);
-};
+}
 
-utils.isFavourite = title => {
+function isFavourite(title) {
   readFavourites();
   return favourites.findIndex(x => x === title) > -1;
-};
+}
 
-utils.addToFavourites = title => {
+function addToFavourites(title) {
   readFavourites();
   addFavouriteItem(title);
   writeFavourites();
-};
+}
 
-utils.removeFromFavourites = title => {
+function removeFromFavourites(title) {
   readFavourites();
   removeFavouriteItem(title);
   writeFavourites();
-};
+}
 
-utils.getFavourites = cb => {
+function getFavourites(cb) {
   readFavourites();
 
   return cb(favourites);
-};
+}
 
-utils.getFavouritesFile = () => {
+function getFavouritesFile() {
   return favouritesConf.path;
-};
+}
+
+utils.isFavourite = isFavourite;
+utils.addToFavourites = addToFavourites;
+utils.removeFromFavourites = removeFromFavourites;
+utils.getFavourites = getFavourites;
+utils.getFavouritesFile = getFavouritesFile;
 
 module.exports = utils;

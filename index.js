@@ -3,7 +3,7 @@ const got = require('got');
 const trim = require('trim');
 const pkg = require('./package.json');
 
-const preferredStreams = [
+const PREFERRED_STREAMS = [
   {quality: 'highest', format: 'aac'},
   {quality: 'highest', format: 'mp3'},
   {quality: 'high', format: 'mp3'},
@@ -12,13 +12,13 @@ const preferredStreams = [
   {quality: 'low', format: 'mp3'}
 ];
 
-const gotOpts = {
+const GOT_OPTS = {
   headers: {
     'user-agent': `somafm/${pkg.version} (https://github.com/uschek/somafm)`
   }
 };
 
-const somafm = module.exports;
+const somafm = {};
 
 somafm.getChannels = (options, cb) => {
   if (typeof options === 'function') {
@@ -30,9 +30,9 @@ somafm.getChannels = (options, cb) => {
 
   options = Object.assign({}, options);
 
-  options.streams = Object.assign(preferredStreams, options.streams);
+  options.streams = Object.assign(PREFERRED_STREAMS, options.streams);
 
-  got('https://api.somafm.com/channels.json', gotOpts)
+  got('https://api.somafm.com/channels.json', GOT_OPTS)
     .then(res => {
       parse(res.body, options, cb);
     })
@@ -133,3 +133,5 @@ somafm.getChannel = (id, cb) => {
     return cb(new Error('Channel not found.'), null);
   });
 };
+
+module.exports = somafm;
