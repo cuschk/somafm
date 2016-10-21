@@ -29,10 +29,10 @@ function showHelp() {
   ${pkg.description}
 
   Usage
-    somafm <command> [<channel>]
+    somafm <command> [<args>]
 
   Commands
-    list [<search>]     list channels, optionally filter
+    list [<keywords>]   list channels, optionally filter by keywords
     info <channel>      show channel information
     play <channel>      play channel
     record <channel>    start recording channel

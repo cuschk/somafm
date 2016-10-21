@@ -100,10 +100,10 @@ somafm.getChannels = (options, cb) => {
     return null;
   }
 
-  function filterChannels(channels, search) {
+  function filterChannels(channels, keywords) {
     const regexes = [];
-    for (let i = 0; i < search.length; i++) {
-      regexes.push(new RegExp(search[i]));
+    for (let i = 0; i < keywords.length; i++) {
+      regexes.push(new RegExp(keywords[i]));
     }
 
     return channels.filter(channel => {
