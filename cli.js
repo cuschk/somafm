@@ -254,7 +254,7 @@ function record(channel, cb) {
   streamripperProc.stdout.on('data', data => {
     const line = data.toString();
 
-    const regex = /^\[(r|sk)ipping.*\] (.*) \[(.{7})\]$/m;
+    const regex = /^\[(r|sk)ipping.*] (.*) \[(.{7})]$/m;
     const res = line.match(regex);
 
     if (res && res[1] && res[2]) {
