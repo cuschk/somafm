@@ -46,15 +46,24 @@ function getChannels(options, cb) {
             return;
           }
 
-          writeChannels(res);
+          channels = res;
+          writeChannels(channels);
 
-          cb(null, res);
+          if (options.search && options.search.length > 0) {
+            channels = filterChannels(channels, options.search);
+          }
+
+          cb(null, channels);
         });
       })
       .catch(err => {
         cb(err);
       });
   } else {
+    if (options.search && options.search.length > 0) {
+      channels = filterChannels(channels, options.search);
+    }
+
     cb(null, channels);
   }
 }
@@ -65,11 +74,7 @@ function parseData(res, options, cb) {
   const data = options.sortChannels ?
     res.channels.sort(compareChannelObjects) :
     res.channels;
-  let channels = [];
-
-  if (options.raw) {
-    return cb(null, data);
-  }
+  const channels = [];
 
   data.forEach(channel => {
     const streamHighestQuality = getHighestQualityStream(channel, options.streams);
@@ -87,10 +92,6 @@ function parseData(res, options, cb) {
     };
     channels.push(channelObj);
   });
-
-  if (options.search && options.search.length > 0) {
-    channels = filterChannels(channels, options.search);
-  }
 
   return cb(null, channels);
 }
@@ -122,12 +123,12 @@ function getHighestQualityStream(channel, streams) {
 function filterChannels(channels, keywords) {
   const regexes = [];
   for (let i = 0; i < keywords.length; i++) {
-    regexes.push(new RegExp(keywords[i]));
+    regexes.push(new RegExp(keywords[i], 'i'));
   }
 
   return channels.filter(channel => {
     for (let i = 0; i < regexes.length; i++) {
-      if (!channel.title.match(regexes[i]) && !channel.description.match(regexes[i]) && !channel.genre.match(regexes[i]) && !channel.dj.match(regexes[i])) {
+      if (!channel.id.match(regexes[i]) && !channel.title.match(regexes[i]) && !channel.description.match(regexes[i]) && !channel.genre.match(regexes[i]) && !channel.dj.match(regexes[i])) {
         return false;
       }
     }
