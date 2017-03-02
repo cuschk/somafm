@@ -30,7 +30,14 @@ function showHelp() {
   ${pkg.description}
 
   Usage
-    somafm <command> [<args>]
+    $ somafm [<command> <args>]
+
+  Example
+    $ somafm
+    $ somafm list
+    $ somafm list ambient
+    $ somafm info groovesalad
+    $ somafm play fluid
 
   Commands
     list [<keywords>]   list channels, optionally filter by keywords
@@ -38,13 +45,7 @@ function showHelp() {
     play <channel>      play channel
     record <channel>    start recording channel
     list-favourites     list your favourite songs
-    edit-favourites     edit your favourite songs
-
-  Examples
-    somafm list
-    somafm list ambient
-    somafm info groovesalad
-    somafm play fluid`
+    edit-favourites     edit your favourite songs`
   );
 }
 
