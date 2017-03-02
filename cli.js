@@ -3,6 +3,7 @@
 const childProcess = require('child_process');
 const chalk = require('chalk');
 const minimist = require('minimist');
+const inquirer = require('inquirer');
 const isBin = require('isbin');
 const dateFormat = require('dateformat');
 const trim = require('trim');
@@ -100,7 +101,23 @@ function info() {
   });
 }
 
-function play(channel, cb) {
+function play(channelId) {
+  somafm.getChannel(channelId, (err, channel) => {
+    if (err) {
+      console.error(err.toString());
+      process.exit(10);
+    }
+
+    playChannel(channel, err => {
+      if (err) {
+        console.error(err.toString());
+        process.exit(30);
+      }
+    });
+  });
+}
+
+function playChannel(channel, cb) {
   if (!isBin(mplayerBin)) {
     cb(new Error('MPlayer executable not found. Please ensure MPlayer is installed on your system and runnable with the "mplayer" command.'));
     return;
@@ -196,6 +213,30 @@ function play(channel, cb) {
   mplayerProc.on('exit', () => {
     termTitle();
     cb(null);
+  });
+}
+
+function interactive() {
+  somafm.getChannels({sortChannels: true}, (err, res) => {
+    if (err) {
+      console.error(err.toString());
+      process.exit(20);
+    }
+
+    inquirer.prompt([
+      {
+        type: 'list',
+        name: 'channel',
+        message: 'Channel:',
+        choices: res.map(channel => ({
+          name: `${channel.title} (${chalk.blue(channel.genre)})`,
+          value: channel.id,
+          short: channel.title
+        })).concat([new inquirer.Separator()])
+      }
+    ]).then(answers => {
+      play(answers.channel);
+    });
   });
 }
 
@@ -295,8 +336,8 @@ function init(args, options) {
   }
 
   if (args.length === 0) {
-    showHelp();
-    process.exit(1);
+    interactive();
+    return;
   }
 
   if (['list', 'l'].indexOf(args[0]) > -1) {
@@ -310,19 +351,7 @@ function init(args, options) {
   }
 
   if (['play', 'p'].indexOf(args[0]) > -1 && args[1]) {
-    somafm.getChannel(args[1], (err, channel) => {
-      if (err) {
-        console.error(err.toString());
-        process.exit(10);
-      }
-
-      play(channel, err => {
-        if (err) {
-          console.error(err.toString());
-          process.exit(30);
-        }
-      });
-    });
+    play(args[1]);
     return;
   }
 

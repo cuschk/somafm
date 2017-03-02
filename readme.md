@@ -14,6 +14,10 @@ $ npm install --global somafm
 
 ## Usage
 
+### `$ somafm`
+
+Choose a channel to play from the list.
+
 ### `$ somafm list [<keywords>]`
 
 List [SomaFM channels](https://somafm.com/listen/). You can filter by one or more keywords.
