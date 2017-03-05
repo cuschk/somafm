@@ -22,7 +22,7 @@ const GOT_OPTS = {
 const channelsConf = new CacheConf({projectName: pkg.name, configName: 'channels'});
 
 const somafm = {};
-let channels;
+let channels = [];
 
 function getChannels(options, cb) {
   if (typeof options === 'function') {
@@ -35,7 +35,9 @@ function getChannels(options, cb) {
   options = Object.assign({}, options);
   options.streams = Object.assign(PREFERRED_STREAMS, options.streams);
 
-  channels = readChannels();
+  if (channels.length === 0) {
+    channels = readChannels();
+  }
 
   if (channels.length === 0 || options.forceUpdate) {
     got('https://api.somafm.com/channels.json', GOT_OPTS)
