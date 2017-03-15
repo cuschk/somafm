@@ -51,7 +51,7 @@
     "inquirer": "^3.0.5",
     "isbin": "0.0.3",
     "log-update": "^1.0.2",
-    "minimist": "^1.2.0",
+    "meow": "^3.7.0",
     "term-title": "^1.0.0",
     "trim": "0.0.1"
   },

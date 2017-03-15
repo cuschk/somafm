@@ -2,7 +2,7 @@
 'use strict';
 const childProcess = require('child_process');
 const chalk = require('chalk');
-const minimist = require('minimist');
+const meow = require('meow');
 const inquirer = require('inquirer');
 const isBin = require('isbin');
 const dateFormat = require('dateformat');
@@ -14,21 +14,9 @@ const logUpdate = require('log-update');
 const cliCursor = require('cli-cursor');
 const editor = require('editor');
 const utils = require('./utils');
-const pkg = require('./package.json');
 const somafm = require('./');
 
-const options = minimist(process.argv.slice(2));
-const args = options._;
-delete options._;
-
-const mplayerBin = 'mplayer';
-const streamripperBin = 'streamripper';
-
-function showHelp() {
-  console.log(
-  `
-  ${pkg.description}
-
+const cli = meow(`
   Usage
     $ somafm [<command> <args>]
 
@@ -45,9 +33,16 @@ function showHelp() {
     play <channel>      play channel
     record <channel>    start recording channel
     list-favourites     list your favourite songs
-    edit-favourites     edit your favourite songs`
-  );
-}
+    edit-favourites     edit your favourite songs
+`, {
+  alias: {
+    h: 'help',
+    v: 'version'
+  }
+});
+
+const mplayerBin = 'mplayer';
+const streamripperBin = 'streamripper';
 
 function showChannelList(channels) {
   console.log();
@@ -91,8 +86,8 @@ function list(search) {
   });
 }
 
-function info() {
-  somafm.getChannel(args[1], (err, channel) => {
+function info(channelId) {
+  somafm.getChannel(channelId, (err, channel) => {
     if (err) {
       console.error(err.toString());
       process.exit(10);
@@ -325,39 +320,29 @@ function record(channel, cb) {
   });
 }
 
-function init(args, options) {
-  if (options.version) {
-    console.log(pkg.version);
-    process.exit();
-  }
-
-  if (options.help) {
-    showHelp();
-    process.exit();
-  }
-
-  if (args.length === 0) {
+function init() {
+  if (cli.input.length === 0) {
     interactive();
     return;
   }
 
-  if (['list', 'l'].indexOf(args[0]) > -1) {
-    list(args.slice(1));
+  if (['list', 'l'].indexOf(cli.input[0]) > -1) {
+    list(cli.input.slice(1));
     return;
   }
 
-  if (['info', 'i'].indexOf(args[0]) > -1 && args[1]) {
-    info();
+  if (['info', 'i'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
+    info(cli.input[1]);
     return;
   }
 
-  if (['play', 'p'].indexOf(args[0]) > -1 && args[1]) {
-    play(args[1]);
+  if (['play', 'p'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
+    play(cli.input[1]);
     return;
   }
 
-  if (['record', 'r'].indexOf(args[0]) > -1 && args[1]) {
-    somafm.getChannel(args[1], (err, channel) => {
+  if (['record', 'r'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
+    somafm.getChannel(cli.input[1], (err, channel) => {
       if (err) {
         console.error(err.toString());
         process.exit(10);
@@ -373,7 +358,7 @@ function init(args, options) {
     return;
   }
 
-  if (['list-favourites', 'list-favorites', 'lf'].indexOf(args[0]) > -1) {
+  if (['list-favourites', 'list-favorites', 'lf'].indexOf(cli.input[0]) > -1) {
     utils.getFavourites(favourites => {
       console.log();
       favourites.forEach(title => {
@@ -383,13 +368,13 @@ function init(args, options) {
     return;
   }
 
-  if (['edit-favourites', 'edit-favorites', 'ef'].indexOf(args[0]) > -1) {
+  if (['edit-favourites', 'edit-favorites', 'ef'].indexOf(cli.input[0]) > -1) {
     editor(utils.getFavouritesFile());
     return;
   }
 
-  showHelp();
+  cli.showHelp();
   process.exit(1);
 }
 
-init(args, options);
+init();
