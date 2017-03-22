@@ -5,8 +5,8 @@ const CacheConf = require('cache-conf');
 const pkg = require('./package.json');
 
 const PREFERRED_STREAMS = [
-  {quality: 'highest', format: 'aac'},
   {quality: 'highest', format: 'mp3'},
+  {quality: 'highest', format: 'aac'},
   {quality: 'high', format: 'mp3'},
   {quality: 'high', format: 'aacp'},
   {quality: 'low', format: 'aacp'},
