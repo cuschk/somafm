@@ -49,6 +49,7 @@
     "editor": "^1.0.0",
     "got": "^6.7.1",
     "inquirer": "^3.0.5",
+    "inquirer-autocomplete-prompt": "^0.8.0",
     "isbin": "0.0.3",
     "log-update": "^1.0.2",
     "meow": "^3.7.0",

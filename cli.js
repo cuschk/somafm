@@ -219,21 +219,33 @@ function interactive() {
       process.exit(20);
     }
 
+    inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+
+    const channels = res.map(channel => ({
+      name: `${channel.title} (${chalk.blue(channel.genre)})`,
+      value: channel.id,
+      short: channel.title
+    }));
+
     inquirer.prompt([
       {
-        type: 'list',
+        type: 'autocomplete',
         name: 'channel',
-        message: 'Channel:',
-        choices: res.map(channel => ({
-          name: `${channel.title} (${chalk.blue(channel.genre)})`,
-          value: channel.id,
-          short: channel.title
-        })).concat([new inquirer.Separator()])
+        message: 'Channel  ',
+        source: (answers, input) => Promise.resolve().then(() => filterChannels(input, channels))
       }
     ]).then(answers => {
       play(answers.channel);
     });
   });
+}
+
+function filterChannels(input, channels) {
+  if (input !== null) {
+    return channels.filter(channel => channel.name.toLowerCase().includes(input.toLowerCase()));
+  }
+
+  return channels;
 }
 
 function logTitle(time, title, favourite, playing) {
