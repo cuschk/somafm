@@ -210,6 +210,8 @@ function playChannel(channel, cb) {
     termTitle();
     cb(null);
   });
+
+  utils.setLastChannel(channel.id);
 }
 
 function interactive() {
@@ -228,7 +230,8 @@ function interactive() {
           name: `${channel.title} (${chalk.blue(channel.genre)})`,
           value: channel.id,
           short: channel.title
-        })).concat([new inquirer.Separator()])
+        })).concat([new inquirer.Separator()]),
+        default: utils.getLastChannel()
       }
     ]).then(answers => {
       play(answers.channel);
