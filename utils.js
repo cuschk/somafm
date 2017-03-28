@@ -3,7 +3,6 @@ const Conf = require('conf');
 const arrayUnion = require('array-union');
 
 const favouritesConf = new Conf({configName: 'favourites'});
-const settingsConf = new Conf({configName: 'settings'});
 
 const utils = {};
 let favourites;
@@ -56,20 +55,10 @@ function getFavouritesFile() {
   return favouritesConf.path;
 }
 
-function setLastChannel(channel) {
-  settingsConf.set('lastChannel', channel);
-}
-
-function getLastChannel() {
-  return settingsConf.get('lastChannel');
-}
-
 utils.isFavourite = isFavourite;
 utils.addToFavourites = addToFavourites;
 utils.removeFromFavourites = removeFromFavourites;
 utils.getFavourites = getFavourites;
 utils.getFavouritesFile = getFavouritesFile;
-utils.setLastChannel = setLastChannel;
-utils.getLastChannel = getLastChannel;
 
 module.exports = utils;
