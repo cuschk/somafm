@@ -61,7 +61,7 @@ All commands have short aliases for faster typing.
 
 Command           | Alias
 ----------------- | -----
-`list`            | `l`
+`list`            | `ls`
 `play`            | `p`
 `info`            | `i`
 `record`          | `r`

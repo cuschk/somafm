@@ -329,7 +329,7 @@ function init() {
     return;
   }
 
-  if (['list', 'l'].indexOf(cli.input[0]) > -1) {
+  if (['list', 'ls', 'l'].indexOf(cli.input[0]) > -1) {
     list(cli.input.slice(1));
     return;
   }
