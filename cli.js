@@ -14,7 +14,10 @@ const logUpdate = require('log-update');
 const cliCursor = require('cli-cursor');
 const editor = require('editor');
 const utils = require('./utils');
-const somafm = require('./');
+const somafm = require('.');
+
+const FIGURE_HEART = '❤';
+const FIGURE_PLAY = '▶';
 
 const cli = meow(`
   Usage
@@ -76,176 +79,168 @@ function showChannel(channel) {
 }
 
 function list(search) {
-  somafm.getChannels({search, sortChannels: true}, (err, res) => {
-    if (err) {
+  somafm.getChannels({search, sortChannels: true})
+    .then(showChannelList)
+    .catch(err => {
       console.error(err.toString());
       process.exit(20);
-    }
-
-    showChannelList(res);
-  });
+    });
 }
 
 function info(channelId) {
-  somafm.getChannel(channelId, (err, channel) => {
-    if (err) {
+  somafm.getChannel(channelId)
+    .then(channel => {
+      showChannel(channel);
+    })
+    .catch(err => {
       console.error(err.toString());
       process.exit(10);
-    }
-
-    showChannel(channel);
-  });
+    });
 }
 
 function play(channelId) {
-  somafm.getChannel(channelId, (err, channel) => {
-    if (err) {
+  somafm.getChannel(channelId)
+    .then(playChannel)
+    .catch(err => {
       console.error(err.toString());
       process.exit(10);
-    }
-
-    playChannel(channel, err => {
-      if (err) {
-        console.error(err.toString());
-        process.exit(30);
-      }
     });
-  });
 }
 
-function playChannel(channel, cb) {
-  if (!isBin(mplayerBin)) {
-    cb(new Error('MPlayer executable not found. Please ensure MPlayer is installed on your system and runnable with the "mplayer" command.'));
-    return;
-  }
-
-  let currentTitle = '';
-  let currentTitleOut;
-  let currentTime;
-  let currentFavourite;
-
-  cliCursor.hide();
-  console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
-
-  const args = [
-    '-quiet',
-    '-playlist',
-    channel.stream.url
-  ];
-  const mplayerProc = childProcess.spawn(mplayerBin, args);
-
-  const stdin = process.stdin;
-  stdin.setRawMode(true);
-  stdin.resume();
-  stdin.setEncoding('utf-8');
-
-  stdin.on('data', key => {
-    if (['m', '9', '0', '/', '*'].indexOf(key) > -1) {
-      mplayerProc.stdin.write(key);
+function playChannel(channel) {
+  return new Promise((resolve, reject) => {
+    if (!isBin(mplayerBin)) {
+      reject(new Error('MPlayer executable not found. Please ensure MPlayer is installed on your system and runnable with the "mplayer" command.'));
     }
 
-    if (key === 'c') {
-      copy(currentTitle);
-    }
+    let currentTitle = '';
+    let currentTitleOut;
+    let currentTime;
+    let currentFavourite;
 
-    if (key === 'f' || key === '+') {
-      utils.addToFavourites(currentTitle);
-      currentFavourite = true;
+    cliCursor.hide();
+    console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
 
-      logTitle(currentTime, currentTitleOut, true, true);
-      windowTitle(currentTitleOut, true);
-    }
+    const args = [
+      '-quiet',
+      '-playlist',
+      channel.stream.url
+    ];
+    const mplayerProc = childProcess.spawn(mplayerBin, args);
 
-    if (key === 'u' || key === '-') {
-      utils.removeFromFavourites(currentTitle);
-      currentFavourite = false;
+    const stdin = process.stdin;
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding('utf-8');
 
-      logTitle(currentTime, currentTitleOut, false, true);
-      windowTitle(currentTitleOut);
-    }
-
-    // ctrl+c, esc
-    if (key === '\u0003' || key === '\u001b' || key === 'q') {
-      logTitle(currentTime, currentTitleOut, currentFavourite);
-      logUpdate.done();
-
-      mplayerProc.kill();
-      process.exit();
-    }
-  });
-
-  mplayerProc.stdout.on('data', data => {
-    const line = data.toString();
-
-    const regex = /StreamTitle='(.*)';StreamUrl=/;
-    const res = line.match(regex);
-    let title;
-
-    if (res && (title = res[1])) {
-      const time = dateFormat(new Date(), 'HH:MM:ss');
-      const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
-
-      // overwrite last line
-      if (currentTime) {
-        logTitle(currentTime, currentTitleOut, currentFavourite);
+    stdin.on('data', key => {
+      if (['m', '9', '0', '/', '*'].indexOf(key) > -1) {
+        mplayerProc.stdin.write(key);
       }
 
-      currentTitle = title;
-      currentTime = chalk.yellow(time);
-      currentTitleOut = titleOut;
+      if (key === 'c') {
+        copy(currentTitle);
+      }
 
-      currentFavourite = utils.isFavourite(currentTitle);
+      if (['f', '+'].indexOf(key) > -1) {
+        utils.addToFavourites(currentTitle);
+        currentFavourite = true;
 
-      logUpdate.done();
-      logTitle(currentTime, currentTitleOut, currentFavourite, true);
-      windowTitle(currentTitle, currentFavourite);
-    }
-  });
+        logTitle(currentTime, currentTitleOut, true, true);
+        windowTitle(currentTitleOut, true);
+      }
 
-  mplayerProc.on('error', err => {
-    cb(err);
-  });
+      if (['u', '-'].indexOf(key) > -1) {
+        utils.removeFromFavourites(currentTitle);
+        currentFavourite = false;
 
-  mplayerProc.on('exit', () => {
-    termTitle();
-    cb(null);
+        logTitle(currentTime, currentTitleOut, false, true);
+        windowTitle(currentTitleOut);
+      }
+
+      // ctrl+c, esc, q
+      if (['\u0003', '\u001b', 'q'].indexOf(key) > -1) {
+        logTitle(currentTime, currentTitleOut, currentFavourite);
+        logUpdate.done();
+
+        mplayerProc.kill();
+      }
+    });
+
+    mplayerProc.stdout.on('data', data => {
+      const line = data.toString();
+
+      const regex = /StreamTitle='(.*)';StreamUrl=/;
+      const res = line.match(regex);
+      let title;
+
+      if (res && (title = res[1])) {
+        const time = dateFormat(new Date(), 'HH:MM:ss');
+        const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
+
+        // overwrite last line
+        if (currentTime) {
+          logTitle(currentTime, currentTitleOut, currentFavourite);
+        }
+
+        currentTitle = title;
+        currentTime = chalk.yellow(time);
+        currentTitleOut = titleOut;
+
+        currentFavourite = utils.isFavourite(currentTitle);
+
+        logUpdate.done();
+        logTitle(currentTime, currentTitleOut, currentFavourite, true);
+        windowTitle(currentTitle, currentFavourite);
+      }
+    });
+
+    mplayerProc.on('error', reject);
+
+    mplayerProc.on('exit', () => {
+      termTitle();
+      process.exit(0);
+    });
   });
 }
 
 function interactive() {
-  somafm.getChannels({sortChannels: true}, (err, res) => {
-    if (err) {
+  somafm.getChannels({sortChannels: true})
+    .then(showPrompt)
+    .then(answers => {
+      play(answers.channel);
+    })
+    .catch(err => {
       console.error(err.toString());
       process.exit(20);
-    }
-
-    inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
-
-    const channels = res.map(channel => ({
-      name: `${channel.title} (${chalk.blue(channel.genre)})`,
-      value: channel.id,
-      short: channel.title
-    }));
-
-    inquirer.prompt([
-      {
-        type: 'autocomplete',
-        name: 'channel',
-        message: 'Channel  ',
-        source: (answers, input) => Promise.resolve().then(() => filterChannels(input, channels))
-      }
-    ]).then(answers => {
-      play(answers.channel);
     });
-  });
 }
 
-function filterChannels(input, channels) {
+function showPrompt(channels) {
+  inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+
+  const lines = channels.map(channel => ({
+    name: `${channel.title} (${chalk.blue(channel.genre)})`,
+    value: channel.id,
+    short: channel.title
+  }));
+
+  return inquirer.prompt([
+    {
+      type: 'autocomplete',
+      name: 'channel',
+      message: 'Channel  ',
+      source: (answers, input) => Promise.resolve().then(() => filerLines(input, lines))
+    }
+  ]);
+}
+
+function filerLines(input, lines) {
   if (input !== null) {
-    return channels.filter(channel => channel.name.toLowerCase().includes(input.toLowerCase()));
+    return lines.filter(channel => channel.name.toLowerCase().includes(input.toLowerCase()));
   }
 
-  return channels;
+  return lines;
 }
 
 function logTitle(time, title, favourite, playing) {
@@ -261,13 +256,13 @@ function logTitle(time, title, favourite, playing) {
 
   switch (state) {
     case 1:
-      prefix = `${chalk.red('❤')} `;
+      prefix = `${chalk.red(FIGURE_HEART)} `;
       break;
     case 2:
-      prefix = `${chalk.green('▶')} `;
+      prefix = `${chalk.green(FIGURE_PLAY)} `;
       break;
     case 3:
-      prefix = `${chalk.green('❤')} `;
+      prefix = `${chalk.green(FIGURE_HEART)} `;
       break;
     default:
   }
@@ -276,59 +271,55 @@ function logTitle(time, title, favourite, playing) {
 }
 
 function windowTitle(title, favourite) {
-  termTitle(`${favourite ? '❤' : '▶'} ${title}`);
+  termTitle(`${favourite ? FIGURE_HEART : FIGURE_PLAY} ${title}`);
 }
 
-function record(channel, cb) {
-  if (!isBin(streamripperBin)) {
-    cb(new Error('Streamripper executable not found. Please ensure Streamripper is installed on your system and runnable with the "streamripper" command.'));
-    return;
-  }
-
-  const date = dateFormat(new Date(), 'yyyymmdd_HHMMss');
-  const args = [
-    channel.stream.url,
-    '-D', `${channel.fullTitle}/${date}/%1q %A - %T`
-  ];
-  const streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
-  let currentStatus;
-  let currentTitle;
-
-  cliCursor.hide();
-  console.log(`
-  Recording ${chalk.bold(channel.fullTitle)}
-  to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
-  );
-
-  streamripperProc.stdout.on('data', data => {
-    const line = data.toString();
-
-    const regex = /^\[(r|sk)ipping.*] (.*) \[(.{7})]$/m;
-    const res = line.match(regex);
-
-    if (res && res[1] && res[2]) {
-      if ((currentStatus !== res[1] || currentTitle !== res[2]) && res[2].length > 1) {
-        if (res[3] && trim(res[3]) === '0b') {
-          return;
-        }
-
-        currentStatus = res[1];
-        currentTitle = res[2];
-
-        const time = dateFormat(new Date(), 'HH:MM:ss');
-        const status = res[1] === 'r' ? 'Recording' : 'Skipping ';
-        console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
-      }
+function record(channel) {
+  return new Promise((resolve, reject) => {
+    if (!isBin(streamripperBin)) {
+      reject(new Error('Streamripper executable not found. Please ensure Streamripper is installed on your system and runnable with the "streamripper" command.'));
     }
-  });
 
-  streamripperProc.on('error', err => {
-    cb(err);
-  });
+    const date = dateFormat(new Date(), 'yyyymmdd_HHMMss');
+    const args = [
+      channel.stream.url,
+      '-D', `${channel.fullTitle}/${date}/%1q %A - %T`
+    ];
+    const streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
+    let currentStatus;
+    let currentTitle;
 
-  streamripperProc.on('exit', () => {
-    console.log('Streamripper exited.');
-    cb(null);
+    cliCursor.hide();
+    console.log(`
+    Recording ${chalk.bold(channel.fullTitle)}
+    to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
+    );
+
+    streamripperProc.stdout.on('data', data => {
+      const line = data.toString();
+
+      const regex = /^\[(r|sk)ipping.*] (.*) \[(.{7})]$/m;
+      const res = line.match(regex);
+
+      if (res && res[1] && res[2]) {
+        if ((currentStatus !== res[1] || currentTitle !== res[2]) && res[2].length > 1) {
+          if (res[3] && trim(res[3]) === '0b') {
+            return;
+          }
+
+          currentStatus = res[1];
+          currentTitle = res[2];
+
+          const time = dateFormat(new Date(), 'HH:MM:ss');
+          const status = res[1] === 'r' ? 'Recording' : 'Skipping ';
+          console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
+        }
+      }
+    });
+
+    streamripperProc.on('error', reject);
+
+    streamripperProc.on('exit', resolve);
   });
 }
 
@@ -360,21 +351,20 @@ function init() {
         process.exit(10);
       }
 
-      record(channel, err => {
-        if (err) {
+      record(channel)
+        .catch(err => {
           console.error(err.toString());
           process.exit(40);
-        }
-      });
+        });
     });
     return;
   }
 
   if (['list-favourites', 'list-favorites', 'lf'].indexOf(cli.input[0]) > -1) {
-    utils.getFavourites(favourites => {
+    utils.getFavourites().then(favourites => {
       console.log();
       favourites.forEach(title => {
-        console.log(`  ${chalk.red('❤')} ${title}`);
+        console.log(`  ${chalk.red(FIGURE_HEART)} ${title}`);
       });
     });
     return;

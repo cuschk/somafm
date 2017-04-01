@@ -45,10 +45,9 @@ function removeFromFavourites(title) {
   writeFavourites();
 }
 
-function getFavourites(cb) {
+function getFavourites() {
   readFavourites();
-
-  return cb(favourites);
+  return Promise.resolve().then(() => favourites);
 }
 
 function getFavouritesFile() {

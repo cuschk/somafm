@@ -24,61 +24,50 @@ const channelsConf = new CacheConf({projectName: pkg.name, configName: 'channels
 const somafm = {};
 let channels = [];
 
-function getChannels(options, cb) {
-  if (typeof options === 'function') {
-    cb = options;
-    options = {};
-  } else if (!options) {
-    options = {};
-  }
-
+function getChannels(options) {
   options = Object.assign({}, options);
   options.streams = Object.assign(PREFERRED_STREAMS, options.streams);
 
+  return new Promise((resolve, reject) => {
+    getChannelsFromAPIOrCache(options)
+      .then(channels => {
+        resolve(filterChannels(channels, options.search));
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+
+function getChannelsFromAPIOrCache(options) {
   if (channels.length === 0) {
-    channels = readChannels();
+    channels = getCachedChannels();
   }
 
   if (channels.length === 0 || options.forceUpdate) {
-    got('https://api.somafm.com/channels.json', GOT_OPTS)
-      .then(res => {
-        parseData(res.body, options, (err, res) => {
-          if (err) {
-            cb(err);
-            return;
-          }
-
-          channels = res;
-          writeChannels(channels);
-
-          if (options.search && options.search.length > 0) {
-            channels = filterChannels(channels, options.search);
-          }
-
-          cb(null, channels);
-        });
-      })
-      .catch(err => {
-        cb(err);
-      });
-  } else {
-    if (options.search && options.search.length > 0) {
-      channels = filterChannels(channels, options.search);
-    }
-
-    cb(null, channels);
+    return getChannelsFromAPI(options)
+      .then(setCachedChannels);
   }
+
+  return Promise.resolve(channels);
 }
 
-function parseData(res, options, cb) {
-  res = JSON.parse(res);
+function getChannelsFromAPI(options) {
+  return got('https://api.somafm.com/channels.json', GOT_OPTS)
+    .then(res => {
+      return parseJSONData(res.body, options);
+    });
+}
 
-  const data = options.sortChannels ?
-    res.channels.sort(compareChannelObjects) :
-    res.channels;
+function parseJSONData(json, options) {
+  json = JSON.parse(json);
+
+  const channelsRaw = options.sortChannels ?
+    json.channels.sort(compareChannelObjects) :
+    json.channels;
   const channels = [];
 
-  data.forEach(channel => {
+  channelsRaw.forEach(channel => {
     const streamHighestQuality = getHighestQualityStream(channel, options.streams);
 
     const channelObj = {
@@ -95,7 +84,7 @@ function parseData(res, options, cb) {
     channels.push(channelObj);
   });
 
-  return cb(null, channels);
+  return Promise.resolve(channels);
 }
 
 function compareChannelObjects(a, b) {
@@ -122,10 +111,20 @@ function getHighestQualityStream(channel, streams) {
   return null;
 }
 
-function filterChannels(channels, keywords) {
+function filterChannels(channels, search) {
+  return new Promise(resolve => {
+    if (Array.isArray(search) && search.length > 0) {
+      resolve(applyFilter(channels, search));
+    } else {
+      resolve(channels);
+    }
+  });
+}
+
+function applyFilter(channels, search) {
   const regexes = [];
-  for (let i = 0; i < keywords.length; i++) {
-    regexes.push(new RegExp(keywords[i], 'i'));
+  for (let i = 0; i < search.length; i++) {
+    regexes.push(new RegExp(search[i], 'i'));
   }
 
   return channels.filter(channel => {
@@ -139,38 +138,33 @@ function filterChannels(channels, keywords) {
   });
 }
 
-function getChannel(id, options, cb) {
-  if (typeof options === 'function') {
-    cb = options;
-    options = {};
-  } else if (!options) {
-    options = {};
-  }
-
+function getChannel(id, options) {
   options = Object.assign({sortChannels: true}, options);
 
-  getChannels(options, (err, res) => {
-    if (err) {
-      return cb(err, null);
-    }
-
-    for (const key in res) {
-      if (id.toLowerCase() === res[key].id) {
-        return cb(null, res[key]);
+  return new Promise((resolve, reject) => {
+    getChannels(options).then(channels => {
+      for (let i = 0; i < channels.length; i++) {
+        if (id.toLowerCase() === channels[i].id) {
+          resolve(channels[i]);
+        }
       }
-    }
 
-    return cb(new Error('Channel not found.'), null);
+      reject(new Error('Channel not found.'));
+    }).catch(err => {
+      reject(err);
+    });
   });
 }
 
-function readChannels() {
+function getCachedChannels() {
   return channelsConf.get('channels') || [];
 }
 
-function writeChannels(channels) {
+function setCachedChannels(channels) {
   // cache channels for one minute
   channelsConf.set('channels', channels, {maxAge: 60000});
+
+  return Promise.resolve(channels);
 }
 
 somafm.getChannels = getChannels;

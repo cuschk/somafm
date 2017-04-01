@@ -1,22 +1,18 @@
 import test from 'ava';
-import pify from 'pify';
 import execa from 'execa';
 import m from './';
 
-const getChannels = pify(m.getChannels);
-const getChannel = pify(m.getChannel);
-
 test.serial('fetch channels from API', async t => {
-  const channels = await getChannels({forceUpdate: true});
+  const channels = await m.getChannels({forceUpdate: true});
   t.true(channels.length > 0);
 
-  const search = await getChannels({search: 'ambient'});
+  const search = await m.getChannels({search: ['ambient']});
   t.true(search.length > 0);
   t.true(channels.length > search.length);
 });
 
 test.serial('get single channel', async t => {
-  const channel = await getChannel('groovesalad');
+  const channel = await m.getChannel('groovesalad');
   t.true(channel.title.length > 0);
 });
 
