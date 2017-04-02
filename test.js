@@ -6,9 +6,13 @@ test.serial('fetch channels from API', async t => {
   const channels = await m.getChannels({forceUpdate: true});
   t.true(channels.length > 0);
 
-  const search = await m.getChannels({search: ['ambient']});
-  t.true(search.length > 0);
-  t.true(channels.length > search.length);
+  const filtered1 = await m.getChannels({search: ['ambient']});
+  t.true(filtered1.length > 0);
+  t.true(channels.length > filtered1.length);
+
+  const filtered2 = await m.getChannels({search: 'ambient'});
+  t.true(filtered2.length > 0);
+  t.true(filtered2.length === filtered1.length);
 });
 
 test.serial('get single channel', async t => {

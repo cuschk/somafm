@@ -115,6 +115,8 @@ function filterChannels(channels, search) {
   return new Promise(resolve => {
     if (Array.isArray(search) && search.length > 0) {
       resolve(applyFilter(channels, search));
+    } else if (typeof search === 'string') {
+      resolve(applyFilter(channels, [search]));
     } else {
       resolve(channels);
     }
