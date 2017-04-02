@@ -16,7 +16,7 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "xo && ava"
+    "test": "xo && NODE_ENV=test ava"
   },
   "files": [
     "index.js",

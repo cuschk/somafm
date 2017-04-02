@@ -19,7 +19,8 @@ const GOT_OPTS = {
   }
 };
 
-const channelsConf = new CacheConf({projectName: pkg.name, configName: 'channels'});
+const configName = (process.env.NODE_ENV === 'test' ? 'channels-test' : 'channels');
+const channelsConf = new CacheConf({projectName: pkg.name, configName});
 
 const somafm = {};
 let channels = [];
