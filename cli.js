@@ -345,18 +345,14 @@ function init() {
   }
 
   if (['record', 'r'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
-    somafm.getChannel(cli.input[1], (err, channel) => {
-      if (err) {
+    somafm.getChannel(cli.input[1])
+      .then(channel => {
+        record(channel);
+      })
+      .catch(err => {
         console.error(err.toString());
         process.exit(10);
-      }
-
-      record(channel)
-        .catch(err => {
-          console.error(err.toString());
-          process.exit(40);
-        });
-    });
+      });
     return;
   }
 
