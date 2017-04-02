@@ -48,6 +48,7 @@
     "dateformat": "^2.0.0",
     "editor": "^1.0.0",
     "got": "^6.7.1",
+    "ini": "^1.3.4",
     "inquirer": "^3.0.5",
     "inquirer-autocomplete-prompt": "^0.8.0",
     "isbin": "0.0.3",

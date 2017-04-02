@@ -50,7 +50,7 @@ const streamripperBin = 'streamripper';
 function showChannelList(channels) {
   console.log();
 
-  channels.forEach(channel => {
+  for (const channel of channels) {
     const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
 
     if (process.stdout.columns) {
@@ -58,7 +58,7 @@ function showChannelList(channels) {
     } else {
       console.log(str);
     }
-  });
+  }
 }
 
 function showChannel(channel) {
@@ -74,7 +74,7 @@ function showChannel(channel) {
           ${chalk.yellow('Genre')}   ${channel.genre}
       ${chalk.yellow('Listeners')}   ${channel.listeners}
 
-     ${chalk.yellow('Stream URL')}   ${channel.stream.url}`
+     ${chalk.yellow('Stream URL')}   ${channel.stream.urls[0]}`
   );
 }
 
@@ -123,8 +123,7 @@ function playChannel(channel) {
 
     const args = [
       '-quiet',
-      '-playlist',
-      channel.stream.url
+      channel.stream.urls[0]
     ];
     const mplayerProc = childProcess.spawn(mplayerBin, args);
 
@@ -359,9 +358,9 @@ function init() {
   if (['list-favourites', 'list-favorites', 'lf'].indexOf(cli.input[0]) > -1) {
     utils.getFavourites().then(favourites => {
       console.log();
-      favourites.forEach(title => {
+      for (const title of favourites) {
         console.log(`  ${chalk.red(FIGURE_HEART)} ${title}`);
-      });
+      }
     });
     return;
   }

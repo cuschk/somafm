@@ -18,6 +18,7 @@ test.serial('fetch channels from API', async t => {
 test.serial('get single channel', async t => {
   const channel = await m.getChannel('groovesalad');
   t.true(channel.title.length > 0);
+  t.true(channel.stream.urls.length > 0);
 });
 
 test.serial('cli list', async t => {

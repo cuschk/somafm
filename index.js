@@ -1,5 +1,6 @@
 'use strict';
 const got = require('got');
+const ini = require('ini');
 const trim = require('trim');
 const CacheConf = require('cache-conf');
 const pkg = require('./package.json');
@@ -29,15 +30,10 @@ function getChannels(options) {
   options = Object.assign({}, options);
   options.streams = Object.assign(PREFERRED_STREAMS, options.streams);
 
-  return new Promise((resolve, reject) => {
-    getChannelsFromAPIOrCache(options)
-      .then(channels => {
-        resolve(filterChannels(channels, options.search));
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
+  return getChannelsFromAPIOrCache(options)
+    .then(channels => {
+      return filterChannels(channels, options.search);
+    });
 }
 
 function getChannelsFromAPIOrCache(options) {
@@ -144,18 +140,59 @@ function applyFilter(channels, search) {
 function getChannel(id, options) {
   options = Object.assign({sortChannels: true}, options);
 
-  return new Promise((resolve, reject) => {
-    getChannels(options).then(channels => {
-      for (let i = 0; i < channels.length; i++) {
-        if (id.toLowerCase() === channels[i].id) {
-          resolve(channels[i]);
-        }
-      }
+  // TODO: get rid of callback hell
+  return getChannels(options)
+    .then(channels => {
+      return getChannelById(id, channels)
+        .then(channel => {
+          return getStreamUrls(channel)
+            .then(urls => {
+              channel.stream.urls = urls;
+              setCachedChannels(channels);
 
-      reject(new Error('Channel not found.'));
-    }).catch(err => {
-      reject(err);
+              return Promise.resolve(channel);
+            })
+            .catch(console.log);
+        });
     });
+}
+
+function getChannelById(id, channels) {
+  return new Promise((resolve, reject) => {
+    for (const channel of channels) {
+      if (id.toLowerCase() === channel.id) {
+        resolve(channel);
+      }
+    }
+
+    reject(new Error('Channel not found.'));
+  });
+}
+
+function getStreamUrls(channel) {
+  if (channel.stream.urls) {
+    return Promise.resolve(channel.stream.urls);
+  }
+
+  return getUrlsFromPlaylist(channel.stream.url);
+}
+
+function getUrlsFromPlaylist(playlistUrl) {
+  return new Promise((resolve, reject) => {
+    got(playlistUrl)
+      .then(response => {
+        const data = ini.decode(response.body);
+        const res = [];
+
+        Object.keys(data.playlist)
+          .filter(x => x.match(/^File[0-9]+$/))
+          .forEach(key => {
+            res.push(data.playlist[key]);
+          });
+
+        resolve(res);
+      })
+      .catch(reject);
   });
 }
 
