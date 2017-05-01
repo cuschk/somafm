@@ -121,14 +121,14 @@ function filterChannels(channels, search) {
 }
 
 function applyFilter(channels, search) {
-  const regexes = [];
-  for (let i = 0; i < search.length; i++) {
-    regexes.push(new RegExp(search[i], 'i'));
-  }
-
   return channels.filter(channel => {
-    for (let i = 0; i < regexes.length; i++) {
-      if (!channel.id.match(regexes[i]) && !channel.title.match(regexes[i]) && !channel.description.match(regexes[i]) && !channel.genre.match(regexes[i]) && !channel.dj.match(regexes[i])) {
+    for (let i = 0; i < search.length; i++) {
+      const searchStr = String(search[i]).toLowerCase();
+      if (channel.id.toLowerCase().indexOf(searchStr) === -1 &&
+          channel.title.toLowerCase().indexOf(searchStr) === -1 &&
+          channel.description.toLowerCase().indexOf(searchStr) === -1 &&
+          channel.genre.toLowerCase().indexOf(searchStr) === -1 &&
+          channel.dj.toLowerCase().indexOf(searchStr) === -1) {
         return false;
       }
     }
