@@ -7,7 +7,15 @@
 
 ## Install
 
+With [yarn](https://yarnpkg.com):
+
+```console
+$ yarn global add somafm
 ```
+
+or with [npm](https://www.npmjs.com):
+
+```console
 $ npm install --global somafm
 ```
 
