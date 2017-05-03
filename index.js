@@ -31,9 +31,7 @@ function getChannels(options) {
   options.streams = Object.assign(PREFERRED_STREAMS, options.streams);
 
   return getChannelsFromAPIOrCache(options)
-    .then(channels => {
-      return filterChannels(channels, options.search);
-    });
+    .then(channels => filterChannels(channels, options.search));
 }
 
 function getChannelsFromAPIOrCache(options) {
@@ -51,9 +49,7 @@ function getChannelsFromAPIOrCache(options) {
 
 function getChannelsFromAPI(options) {
   return got('https://api.somafm.com/channels.json', GOT_OPTS)
-    .then(res => {
-      return parseJSONData(res.body, options);
-    });
+    .then(res => parseJSONData(res.body, options));
 }
 
 function parseJSONData(json, options) {
@@ -142,18 +138,16 @@ function getChannel(id, options) {
 
   // TODO: get rid of callback hell
   return getChannels(options)
-    .then(channels => {
-      return getChannelById(id, channels)
-        .then(channel => {
-          return getStreamUrls(channel)
-            .then(urls => {
-              channel.stream.urls = urls;
-              setCachedChannels(channels);
+    .then(channels => getChannelById(id, channels))
+    .then(channel => {
+      return getStreamUrls(channel)
+        .then(urls => {
+          channel.stream.urls = urls;
+          setCachedChannels(channels);
 
-              return Promise.resolve(channel);
-            })
-            .catch(console.log);
-        });
+          return Promise.resolve(channel);
+        })
+        .catch(console.log);
     });
 }
 
