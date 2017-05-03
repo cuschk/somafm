@@ -44,7 +44,18 @@ const cli = meow(`
   }
 });
 
-const mplayerBin = 'mplayer';
+const players = [
+  {
+    cmd: 'mpv',
+    args: ['-quiet'],
+    titleRegex: /.*icy-title: (.*)$/
+  },
+  {
+    cmd: 'mplayer',
+    args: ['-quiet'],
+    titleRegex: /StreamTitle='(.*)';StreamUrl=/
+  }
+];
 const streamripperBin = 'streamripper';
 
 function showChannelList(channels) {
@@ -107,100 +118,107 @@ function play(channelId) {
     });
 }
 
-function playChannel(channel) {
+function getPlayer() {
   return new Promise((resolve, reject) => {
-    if (!isBin(mplayerBin)) {
-      reject(new Error('MPlayer executable not found. Please ensure MPlayer is installed on your system and runnable with the "mplayer" command.'));
+    for (const player of players) {
+      if (isBin(player.cmd)) {
+        resolve(player);
+      }
     }
 
-    let currentTitle = '';
-    let currentTitleOut;
-    let currentTime;
-    let currentFavourite;
+    reject(new Error('No player executable found. Please ensure mpv or MPlayer is installed on your system and runnable within your shell.'));
+  });
+}
 
-    cliCursor.hide();
-    console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
+function playChannel(channel) {
+  return getPlayer()
+    .then(player => {
+      let currentTitle = '';
+      let currentTitleOut;
+      let currentTime;
+      let currentFavourite;
 
-    const args = [
-      '-quiet',
-      channel.stream.urls[0]
-    ];
-    const mplayerProc = childProcess.spawn(mplayerBin, args);
+      cliCursor.hide();
+      console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
 
-    const stdin = process.stdin;
-    stdin.setRawMode(true);
-    stdin.resume();
-    stdin.setEncoding('utf-8');
+      const args = player.args.concat(channel.stream.urls[0]);
+      const playerProc = childProcess.spawn(player.cmd, args);
 
-    stdin.on('data', key => {
-      if (['m', '9', '0', '/', '*'].indexOf(key) > -1) {
-        mplayerProc.stdin.write(key);
-      }
+      const stdin = process.stdin;
+      stdin.setRawMode(true);
+      stdin.resume();
+      stdin.setEncoding('utf-8');
 
-      if (key === 'c') {
-        copy(currentTitle);
-      }
-
-      if (['f', '+'].indexOf(key) > -1) {
-        utils.addToFavourites(currentTitle);
-        currentFavourite = true;
-
-        logTitle(currentTime, currentTitleOut, true, true);
-        windowTitle(currentTitleOut, true);
-      }
-
-      if (['u', '-'].indexOf(key) > -1) {
-        utils.removeFromFavourites(currentTitle);
-        currentFavourite = false;
-
-        logTitle(currentTime, currentTitleOut, false, true);
-        windowTitle(currentTitleOut);
-      }
-
-      // ctrl+c, esc, q
-      if (['\u0003', '\u001b', 'q'].indexOf(key) > -1) {
-        logTitle(currentTime, currentTitleOut, currentFavourite);
-        logUpdate.done();
-
-        mplayerProc.kill();
-      }
-    });
-
-    mplayerProc.stdout.on('data', data => {
-      const line = data.toString();
-
-      const regex = /StreamTitle='(.*)';StreamUrl=/;
-      const res = line.match(regex);
-      let title;
-
-      if (res && (title = res[1])) {
-        const time = dateFormat(new Date(), 'HH:MM:ss');
-        const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
-
-        // overwrite last line
-        if (currentTime) {
-          logTitle(currentTime, currentTitleOut, currentFavourite);
+      stdin.on('data', key => {
+        if (['m', '9', '0', '/', '*'].indexOf(key) > -1) {
+          playerProc.stdin.write(key);
         }
 
-        currentTitle = title;
-        currentTime = chalk.yellow(time);
-        currentTitleOut = titleOut;
+        if (key === 'c') {
+          copy(currentTitle);
+        }
 
-        currentFavourite = utils.isFavourite(currentTitle);
+        if (['f', '+'].indexOf(key) > -1) {
+          utils.addToFavourites(currentTitle);
+          currentFavourite = true;
 
-        logUpdate.done();
-        logTitle(currentTime, currentTitleOut, currentFavourite, true);
-        windowTitle(currentTitle, currentFavourite);
-      }
+          logTitle(currentTime, currentTitleOut, true, true);
+          windowTitle(currentTitleOut, true);
+        }
+
+        if (['u', '-'].indexOf(key) > -1) {
+          utils.removeFromFavourites(currentTitle);
+          currentFavourite = false;
+
+          logTitle(currentTime, currentTitleOut, false, true);
+          windowTitle(currentTitleOut);
+        }
+
+        // ctrl+c, esc, q
+        if (['\u0003', '\u001b', 'q'].indexOf(key) > -1) {
+          logTitle(currentTime, currentTitleOut, currentFavourite);
+          logUpdate.done();
+
+          playerProc.kill();
+        }
+      });
+
+      playerProc.stdout.on('data', data => {
+        const line = trim(data.toString());
+
+        const res = line.match(player.titleRegex);
+        let title;
+
+        if (res && (title = res[1])) {
+          const time = dateFormat(new Date(), 'HH:MM:ss');
+          const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
+
+          // overwrite last line
+          if (currentTime) {
+            logTitle(currentTime, currentTitleOut, currentFavourite);
+          }
+
+          currentTitle = title;
+          currentTime = chalk.yellow(time);
+          currentTitleOut = titleOut;
+
+          currentFavourite = utils.isFavourite(currentTitle);
+
+          logUpdate.done();
+          logTitle(currentTime, currentTitleOut, currentFavourite, true);
+          windowTitle(currentTitle, currentFavourite);
+        }
+      });
+
+      playerProc.on('error', Promise.reject);
+
+      playerProc.on('exit', () => {
+        termTitle();
+        process.exit(0);
+      });
+
+      return Promise.resolve();
     });
-
-    mplayerProc.on('error', reject);
-
-    mplayerProc.on('exit', () => {
-      termTitle();
-      process.exit(0);
-    });
-  });
 }
 
 function interactive() {

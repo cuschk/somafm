@@ -24,7 +24,7 @@ List [SomaFM channels](https://somafm.com/listen/). You can filter by one or mor
 
 ### `$ somafm play <channel>`
 
-Play a channel. Requires [MPlayer](https://mplayerhq.hu). Please make sure you have it installed and the `mplayer` command can be run within your shell.
+Play a channel. Requires [mpv](https://mpv.io) or [MPlayer](https://mplayerhq.hu). Please make sure you have at least one of them installed and the `mpv` or `mplayer` command can be run within your shell.
 
 #### Keyboard shortcuts
 
