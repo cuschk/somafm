@@ -13,11 +13,9 @@ const copy = require('copy-paste').copy;
 const logUpdate = require('log-update');
 const cliCursor = require('cli-cursor');
 const editor = require('editor');
+const figures = require('./figures');
 const utils = require('./utils');
 const somafm = require('.');
-
-const FIGURE_HEART = '❤';
-const FIGURE_PLAY = '▶';
 
 const cli = meow(`
   Usage
@@ -65,7 +63,7 @@ function showChannelList(channels) {
     const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
 
     if (process.stdout.columns) {
-      console.log(cliTruncate(str, process.stdout.columns));
+      console.log(cliTruncate(str, process.stdout.columns - 1));
     } else {
       console.log(str);
     }
@@ -273,13 +271,13 @@ function logTitle(time, title, favourite, playing) {
 
   switch (state) {
     case 1:
-      prefix = `${chalk.red(FIGURE_HEART)} `;
+      prefix = `${chalk.red(figures.heart)} `;
       break;
     case 2:
-      prefix = `${chalk.green(FIGURE_PLAY)} `;
+      prefix = `${chalk.green(figures.play)} `;
       break;
     case 3:
-      prefix = `${chalk.green(FIGURE_HEART)} `;
+      prefix = `${chalk.green(figures.heart)} `;
       break;
     default:
   }
@@ -288,7 +286,7 @@ function logTitle(time, title, favourite, playing) {
 }
 
 function windowTitle(title, favourite) {
-  termTitle(`${favourite ? FIGURE_HEART : FIGURE_PLAY} ${title}`);
+  termTitle(`${favourite ? figures.heart : figures.play} ${title}`);
 }
 
 function record(channel) {
@@ -377,7 +375,7 @@ function init() {
     utils.getFavourites().then(favourites => {
       console.log();
       for (const title of favourites) {
-        console.log(`  ${chalk.red(FIGURE_HEART)} ${title}`);
+        console.log(`  ${chalk.red(figures.heart)} ${title}`);
       }
     });
     return;
