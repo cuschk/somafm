@@ -21,6 +21,7 @@
   "files": [
     "index.js",
     "cli.js",
+    "figures.js",
     "utils.js"
   ],
   "keywords": [
