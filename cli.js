@@ -173,7 +173,7 @@ function playChannel(channel) {
           windowTitle(currentTitleOut);
         }
 
-        // ctrl+c, esc, q
+        // `ctrl`+`c`, `esc`, `q`
         if (['\u0003', '\u001b', 'q'].indexOf(key) > -1) {
           logTitle(currentTime, currentTitleOut, currentFavourite);
           logUpdate.done();
@@ -192,7 +192,7 @@ function playChannel(channel) {
           const time = dateFormat(new Date(), 'HH:MM:ss');
           const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
 
-          // overwrite last line
+          // Overwrite last line
           if (currentTime) {
             logTitle(currentTime, currentTitleOut, currentFavourite);
           }

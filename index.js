@@ -195,7 +195,7 @@ function getCachedChannels() {
 }
 
 function setCachedChannels(channels) {
-  // cache channels for one minute
+  // Cache channels for one minute
   channelsConf.set('channels', channels, {maxAge: 60000});
 
   return Promise.resolve(channels);
