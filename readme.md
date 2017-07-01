@@ -32,7 +32,7 @@ List [SomaFM channels](https://somafm.com/listen/). You can filter by one or mor
 
 ### `$ somafm play <channel>`
 
-Play a channel. Requires [mpv](https://mpv.io) or [MPlayer](https://mplayerhq.hu). Please make sure you have at least one of them installed and the `mpv` or `mplayer` command can be run within your shell.
+Play a channel. Requires [MPlayer](https://mplayerhq.hu) or [mpv](https://mpv.io). Please make sure you have at least one of them installed and the `mplayer` or `mpv` command can be run within your shell.
 
 #### Keyboard shortcuts
 
@@ -41,10 +41,12 @@ Description                          | Key
 Copy current song title to clipboard | <kbd>c</kbd>
 Add current song to favourites       | <kbd>f</kbd> or <kbd>+</kbd>
 Remove current song from favourites  | <kbd>u</kbd> or <kbd>-</kbd>
-Increase volume                      | <kbd>\*</kbd> or <kbd>0</kbd>
-Decrease volume                      | <kbd>/</kbd> or <kbd>9</kbd>
-Mute/unmute                          | <kbd>m</kbd>
+Increase volume*                     | <kbd>\*</kbd> or <kbd>0</kbd>
+Decrease volume*                     | <kbd>/</kbd> or <kbd>9</kbd>
+Mute/unmute*                         | <kbd>m</kbd>
 Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
+
+<small>_* MPlayer only_</small>
 
 ### `$ somafm info <channel>`
 

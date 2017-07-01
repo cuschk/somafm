@@ -44,14 +44,15 @@ const cli = meow(`
 
 const players = [
   {
-    cmd: 'mpv',
-    args: ['-quiet'],
-    titleRegex: /.*icy-title: (.*)$/
-  },
-  {
     cmd: 'mplayer',
     args: ['-quiet'],
-    titleRegex: /StreamTitle='(.*)';StreamUrl=/
+    titleRegex: /StreamTitle='(.*)';StreamUrl=/,
+    keyPress: true
+  },
+  {
+    cmd: 'mpv',
+    args: ['--msg-level=all=info'],
+    titleRegex: /.*icy-title: (.*)$/
   }
 ];
 const streamripperBin = 'streamripper';
@@ -148,7 +149,7 @@ function playChannel(channel) {
       stdin.setEncoding('utf-8');
 
       stdin.on('data', key => {
-        if (['m', '9', '0', '/', '*'].indexOf(key) > -1) {
+        if (player.keyPress && ['m', '9', '0', '/', '*'].indexOf(key) > -1) {
           playerProc.stdin.write(key);
         }
 
