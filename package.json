@@ -16,7 +16,9 @@
     "node": ">=4"
   },
   "scripts": {
-    "test": "xo && NODE_ENV=test ava"
+    "test": "xo && NODE_ENV=test ava",
+    "build": "gulp build",
+    "clean": "gulp clean"
   },
   "files": [
     "index.js",
@@ -59,7 +61,14 @@
   },
   "devDependencies": {
     "ava": "^0.20.0",
+    "del": "^3.0.0",
     "execa": "^0.7.0",
+    "gulp": "^3.9.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-zip": "^4.0.0",
+    "p-map": "^1.1.1",
+    "pkg": "^4.1.1",
+    "vinyl-paths": "^2.1.0",
     "xo": "^0.18.2"
   },
   "xo": {
