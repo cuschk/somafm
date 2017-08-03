@@ -175,7 +175,9 @@ function playChannel(channel) {
 
         // `ctrl`+`c`, `esc`, `q`
         if (['\u0003', '\u001b', 'q'].indexOf(key) > -1) {
-          logTitle(currentTime, currentTitleOut, currentFavourite);
+          if (currentTitleOut) {
+            logTitle(currentTime, currentTitleOut, currentFavourite);
+          }
           logUpdate.done();
 
           playerProc.kill();
