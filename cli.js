@@ -53,6 +53,10 @@ const players = [
     cmd: 'mpv',
     args: ['--msg-level=all=info'],
     titleRegex: /.*icy-title: (.*)$/
+  },
+  {
+    cmd: 'mpg321',
+    args: []
   }
 ];
 const streamripperBin = 'streamripper';
@@ -186,6 +190,10 @@ function playChannel(channel) {
 
       playerProc.stdout.on('data', data => {
         const line = trim(data.toString());
+
+        if (!player.titleRegex) {
+          return false;
+        }
 
         const res = line.match(player.titleRegex);
         let title;
