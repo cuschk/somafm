@@ -45,6 +45,7 @@ Increase volume*                     | <kbd>\*</kbd> or <kbd>0</kbd>
 Decrease volume*                     | <kbd>/</kbd> or <kbd>9</kbd>
 Mute/unmute*                         | <kbd>m</kbd>
 Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
+Record the currently playing channel | <kbd>r</kbd>
 
 <small>_* MPlayer only_</small>
 

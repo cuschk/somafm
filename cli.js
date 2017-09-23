@@ -56,6 +56,8 @@ const players = [
   }
 ];
 const streamripperBin = 'streamripper';
+let currentlyPlaying = false;
+let currentlyRecording = false;
 
 function showChannelList(channels) {
   console.log();
@@ -130,6 +132,7 @@ function getPlayer() {
 }
 
 function playChannel(channel) {
+  somafm.settings.currentChannelId = channel.id;
   return getPlayer()
     .then(player => {
       let currentTitle = '';
@@ -142,6 +145,8 @@ function playChannel(channel) {
 
       const args = player.args.concat(channel.stream.urls[0]);
       const playerProc = childProcess.spawn(player.cmd, args);
+
+      currentlyPlaying = true;
 
       const stdin = process.stdin;
       stdin.setRawMode(true);
@@ -246,7 +251,7 @@ function playChannel(channel) {
 
           // Overwrite last line
           if (currentTime) {
-            logTitle(currentTime, currentTitleOut, currentFavourite);
+            logTitle(currentTime, currentTitleOut, currentFavourite, currentlyRecording);
           }
 
           currentTitle = title;
@@ -256,8 +261,8 @@ function playChannel(channel) {
           currentFavourite = utils.isFavourite(currentTitle);
 
           logUpdate.done();
-          logTitle(currentTime, currentTitleOut, currentFavourite, true);
-          windowTitle(currentTitle, currentFavourite);
+          logTitle(currentTime, currentTitleOut, currentFavourite, true, currentlyRecording);
+          windowTitle(currentTitle, currentFavourite, currentlyRecording);
         }
       });
 
@@ -311,38 +316,26 @@ function filerLines(input, lines) {
   return lines;
 }
 
-function logTitle(time, title, favourite, playing) {
+function logTitle(time, title, favourite, playing, recording) {
   let state = 0;
   let prefix = '';
 
-  if (favourite) {
-    state++;
-  }
-  if (playing) {
-    state += 2;
-  }
+  if (favourite) prefix += `${chalk.green(figures.heart)} `;
+  if (playing) prefix += `${chalk.green(figures.play)} `;
 
-  switch (state) {
-    case 1:
-      prefix = `${chalk.red(figures.heart)} `;
-      break;
-    case 2:
-      prefix = `${chalk.green(figures.play)} `;
-      break;
-    case 3:
-      prefix = `${chalk.green(figures.heart)} `;
-      break;
-    default:
-  }
+  let newTitle = ` ${time}  ${prefix}${title} `;
 
-  logUpdate(`  ${time}  ${prefix}${title}`);
+  if (recording) newTitle += `${chalk.red(figures.recording)} `;
+
+  logUpdate(newTitle);
 }
 
-function windowTitle(title, favourite) {
-  termTitle(`${favourite ? figures.heart : figures.play} ${title}`);
+function windowTitle(title, favourite, recording) {
+  termTitle(`${favourite ? figures.heart : figures.play} ${title} ${recording ? figures.recording : ''}`);
 }
 
 function record(channel) {
+  let playing = currentlyPlaying
   return new Promise((resolve, reject) => {
     if (!isBin(streamripperBin)) {
       reject(new Error('Streamripper executable not found. Please ensure Streamripper is installed on your system and runnable with the "streamripper" command.'));
@@ -358,9 +351,11 @@ function record(channel) {
     let currentTitle;
 
     cliCursor.hide();
+
     console.log(`
-    Recording ${chalk.bold(channel.fullTitle)}
-    to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
+    ${chalk.red(figures.recording)} Recording ${chalk.bold(channel.fullTitle)}
+    to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n
+    Recording will begin at the start of the next track`
     );
 
     streamripperProc.stdout.on('data', data => {
@@ -380,7 +375,7 @@ function record(channel) {
 
           const time = dateFormat(new Date(), 'HH:MM:ss');
           const status = res[1] === 'r' ? 'Recording' : 'Skipping ';
-          console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
+          if (!playing) console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
         }
       }
     });
@@ -415,6 +410,7 @@ function init() {
   if (['record', 'r'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
     somafm.getChannel(cli.input[1])
       .then(channel => {
+        currentlyRecording = true
         record(channel);
       })
       .catch(err => {
