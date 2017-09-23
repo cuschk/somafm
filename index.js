@@ -34,7 +34,7 @@ function initSettings() {
   console.log('Loaded settings file: ' + settingsStore.path)
   settingsStore.set({
     settings: {
-      currentChannelId: '',
+      audioDir: './audio',
       keyMap: {
         'copyToClipboard': 'c',
         'addFavorite': ['f', '+'],

@@ -58,6 +58,7 @@ const players = [
 const streamripperBin = 'streamripper';
 let currentlyPlaying = false;
 let currentlyRecording = false;
+somafm.currentChannelId = '',
 
 function showChannelList(channels) {
   console.log();
@@ -344,7 +345,7 @@ function record(channel) {
     const date = dateFormat(new Date(), 'yyyymmdd_HHMMss');
     const args = [
       channel.stream.url,
-      '-D', `${channel.fullTitle}/${date}/%1q %A - %T`
+      '-D', `${somafm.settings.audioDir}/%1q %A - %T`
     ];
     const streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
     let currentStatus;
@@ -354,7 +355,7 @@ function record(channel) {
 
     console.log(`
     ${chalk.red(figures.recording)} Recording ${chalk.bold(channel.fullTitle)}
-    to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n
+    to directory ${chalk.yellow(`${somafm.settings.audioDir}`)}\n
     Recording will begin at the start of the next track`
     );
 
