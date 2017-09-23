@@ -13,6 +13,7 @@ const copy = require('copy-paste').copy;
 const logUpdate = require('log-update');
 const cliCursor = require('cli-cursor');
 const editor = require('editor');
+const scribble = require('./scribble');
 const figures = require('./figures');
 const utils = require('./utils');
 const somafm = require('.');
@@ -58,7 +59,24 @@ const players = [
 const streamripperBin = 'streamripper';
 let currentlyPlaying = false;
 let currentlyRecording = false;
-somafm.currentChannelId = '',
+somafm.currentChannelId = '';
+let previousTrack = '';
+
+let Scrobbler = null;
+
+if (somafm.settings.lastFm.enableScrobbling
+  && somafm.settings.lastFm.apiKey.length
+  && somafm.settings.lastFm.apiSecret.length
+  && somafm.settings.lastFm.username.length
+  && somafm.settings.lastFm.password.length
+  ) {
+  Scrobbler = new scribble(
+    somafm.settings.lastFm.apiKey,
+    somafm.settings.lastFm.apiSecret,
+    somafm.settings.lastFm.username,
+    somafm.settings.lastFm.password
+  );
+}
 
 function showChannelList(channels) {
   console.log();
@@ -140,6 +158,7 @@ function playChannel(channel) {
       let currentTitleOut;
       let currentTime;
       let currentFavourite;
+      let currentLoved;
 
       cliCursor.hide();
       console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
@@ -178,20 +197,32 @@ function playChannel(channel) {
             copy(currentTitle);
             break;
 
+          case 'lastFmLoveSong':
+            if (somafm.settings.lastFm.enableScrobbling
+            && somafm.settings.lastFm.apiKey.length
+            && somafm.settings.lastFm.apiSecret.length
+            && somafm.settings.lastFm.username.length
+            && somafm.settings.lastFm.password.length) {
+              currentLoved = true;
+              loveSong(getLastFmObject(currentTitle))
+              logTitle(currentTime, currentTitleOut, true, currentFavourite, currentlyRecording, currentLoved);
+            }
+            break;
+
           case 'addFavorite':
             utils.addToFavourites(currentTitle);
             currentFavourite = true;
 
-            logTitle(currentTime, currentTitleOut, true, true, currentlyRecording);
-            windowTitle(currentTitleOut, true, currentlyRecording);
+            logTitle(currentTime, currentTitleOut, true, true, currentlyRecording, currentLoved);
+            windowTitle(currentTitleOut, true, currentlyRecording, currentLoved);
             break;
 
           case 'removeFavorite':
             utils.removeFromFavourites(currentTitle);
             currentFavourite = false;
 
-            logTitle(currentTime, currentTitleOut, false, true, currentlyRecording);
-            windowTitle(currentTitleOut, false, currentlyRecording);
+            logTitle(currentTime, currentTitleOut, false, true, currentlyRecording, currentLoved);
+            windowTitle(currentTitleOut, false, currentlyRecording, currentLoved);
             break;
 
           case 'record':
@@ -228,7 +259,7 @@ function playChannel(channel) {
 
           case 'quit':
             if (currentTitleOut) {
-              logTitle(currentTime, currentTitleOut, currentFavourite, currentlyPlaying, currentlyRecording);
+              logTitle(currentTime, currentTitleOut, currentFavourite, currentlyPlaying, currentlyRecording, currentLoved);
             }
             logUpdate.done();
 
@@ -248,11 +279,13 @@ function playChannel(channel) {
 
         if (res && (title = res[1])) {
           const time = dateFormat(new Date(), 'HH:MM:ss');
-          const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
+          const somaAd = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? true : false;
+          let titleOut = title;
+          if (somaAd) titleOut = chalk.gray(title);
 
           // Overwrite last line
           if (currentTime) {
-            logTitle(currentTime, currentTitleOut, currentFavourite, currentlyRecording);
+            logTitle(currentTime, currentTitleOut, currentFavourite, currentlyRecording, currentLoved, somaAd);
           }
 
           currentTitle = title;
@@ -262,8 +295,8 @@ function playChannel(channel) {
           currentFavourite = utils.isFavourite(currentTitle);
 
           logUpdate.done();
-          logTitle(currentTime, currentTitleOut, currentFavourite, true, currentlyRecording);
-          windowTitle(currentTitle, currentFavourite, currentlyRecording);
+          logTitle(currentTime, currentTitleOut, currentFavourite, true, currentlyRecording, currentLoved);
+          windowTitle(currentTitle, currentFavourite, currentlyRecording, currentLoved);
         }
       });
 
@@ -288,6 +321,14 @@ function interactive() {
       console.error(err.toString());
       process.exit(20);
     });
+}
+
+function loveSong(song) {
+  Scrobbler.Love(song, function(response) {
+    if (response.indexOf('lfm status="ok"') === -1) {
+      console.log(`${chalk.red('Error loving the song')} `)
+    }
+  });
 }
 
 function showPrompt(channels) {
@@ -317,22 +358,52 @@ function filerLines(input, lines) {
   return lines;
 }
 
-function logTitle(time, title, favourite, playing, recording) {
+function getLastFmObject (title) {
+  let titleParts = title.split(' - ');
+  let artist = titleParts[0];
+  titleParts.shift();
+  let track = (titleParts.join(' - ')).replace(/ - /,'');
+
+  return {
+    artist: artist,
+    track: track
+  };
+}
+
+function logTitle(time, title, favourite, playing, recording, loved, somaAd = false) {
   let state = 0;
   let prefix = '';
 
-  if (favourite) prefix += `${chalk.green(figures.heart)} `;
+  if (favourite) prefix += `${chalk.green(figures.favourite)} `;
   if (playing) prefix += `${chalk.green(figures.play)} `;
 
   let newTitle = ` ${time}  ${prefix}${title} `;
 
-  if (recording) newTitle += `${chalk.red(figures.recording)} `;
+  if (loved) newTitle += `${chalk.red(figures.love)} `
+
+  if (recording) newTitle += `${chalk.yellow(figures.record)} `;
 
   logUpdate(newTitle);
+
+  if (somafm.settings.lastFm.enableScrobbling && Scrobbler !== null && !somaAd) {
+    let scrobble = getLastFmObject(title);
+
+    if (title !== previousTrack) {
+      previousTrack = title;
+      currentLoved = false;
+      currentFavourite = false;
+      // TODO: Figure out why Now Playing is giving "invalid signature"
+      Scrobbler.Scrobble(scrobble, function(response) {
+        if (response.indexOf('lfm status="ok"') === -1) {
+          console.log(`${chalk.red('Scrobbling error')} `)
+        }
+      });
+    }
+  }
 }
 
-function windowTitle(title, favourite, recording) {
-  termTitle(`${favourite ? figures.heart : figures.play} ${title} ${recording ? figures.recording : ''}`);
+function windowTitle(title, favourite, recording, loved) {
+  termTitle(`${favourite ? figures.favourite : figures.play} ${title} ${loved ? figures.love : ''} ${recording ? figures.record : ''}`);
 }
 
 function record(channel) {
@@ -354,7 +425,7 @@ function record(channel) {
     cliCursor.hide();
 
     console.log(`
-    ${chalk.red(figures.recording)} Recording ${chalk.bold(channel.fullTitle)}
+    ${chalk.red(figures.record)} Recording ${chalk.bold(channel.fullTitle)}
     to directory ${chalk.yellow(`${somafm.settings.audioDir}`)}\n
     Recording will begin at the start of the next track`
     );
@@ -425,7 +496,7 @@ function init() {
     utils.getFavourites().then(favourites => {
       console.log();
       for (const title of favourites) {
-        console.log(`  ${chalk.red(figures.heart)} ${title}`);
+        console.log(`  ${chalk.red(figures.favourite)} ${title}`);
       }
     });
     return;

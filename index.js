@@ -24,19 +24,29 @@ const channelConfigName = (process.env.NODE_ENV === 'test' ? 'channels-test' : '
 const settingsConfigName = (process.env.NODE_ENV === 'test' ? 'settings-test' : 'settings');
 const channelsConf = new CacheConf({projectName: pkg.name, channelConfigName});
 let settingsStore = new CacheConf();
-settingsStore.delete('settings');
+
 if (settingsStore.get('settings') === undefined) initSettings()
+else console.log('Loaded settings file: ' + settingsStore.path)
 
 const somafm = {};
 let channels = [];
 
 function initSettings() {
-  console.log('Loaded settings file: ' + settingsStore.path)
+  console.log('Created settings file: ' + settingsStore.path)
   settingsStore.set({
     settings: {
       audioDir: './audio',
+      lastFm: {
+        'enableScrobbling': false,
+        'apiKey': '',
+        'apiSecret': '',
+        'username': '',
+        'password': '',
+      },
+
       keyMap: {
         'copyToClipboard': 'c',
+        'lastFmLoveSong': 'h',
         'addFavorite': ['f', '+'],
         'removeFavorite': ['u', '-'],
         'increaseVolume': ['*', '0'],

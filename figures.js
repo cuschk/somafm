@@ -1,14 +1,16 @@
 'use strict';
 const main = {
   play: '▶',
-  heart: '❤',
-  recording: '▼'
+  favourite: '+',
+  love: '❤',
+  record: '▼'
 };
 
 const win = {
   play: '►',
-  heart: '♥',
-  recording: '▼',
+  favourite: '♥',
+  love: '♥',
+  record: '▼',
 };
 
 module.exports = process.platform === 'win32' ? win : main;
