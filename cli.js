@@ -149,38 +149,88 @@ function playChannel(channel) {
       stdin.setEncoding('utf-8');
 
       stdin.on('data', key => {
-        if (player.keyPress && ['m', '9', '0', '/', '*'].indexOf(key) > -1) {
-          playerProc.stdin.write(key);
-        }
+        let userCommand = '';
 
-        if (key === 'c') {
-          copy(currentTitle);
-        }
-
-        if (['f', '+'].indexOf(key) > -1) {
-          utils.addToFavourites(currentTitle);
-          currentFavourite = true;
-
-          logTitle(currentTime, currentTitleOut, true, true);
-          windowTitle(currentTitleOut, true);
-        }
-
-        if (['u', '-'].indexOf(key) > -1) {
-          utils.removeFromFavourites(currentTitle);
-          currentFavourite = false;
-
-          logTitle(currentTime, currentTitleOut, false, true);
-          windowTitle(currentTitleOut);
-        }
-
-        // `ctrl`+`c`, `esc`, `q`
-        if (['\u0003', '\u001b', 'q'].indexOf(key) > -1) {
-          if (currentTitleOut) {
-            logTitle(currentTime, currentTitleOut, currentFavourite);
+        for (let command in somafm.settings.keyMap) {
+          if (somafm.settings.keyMap.hasOwnProperty(command)) {
+            let userKey = somafm.settings.keyMap[command];
+            if (typeof userKey === 'object') {
+              userKey.forEach(function(userListKey) {
+                if (key === userListKey) userCommand = command
+              }, this);
+            } else if (typeof userKey === 'string') {
+              if (key === userKey) userCommand = command
+            }
           }
-          logUpdate.done();
+        }
 
-          playerProc.kill();
+        // Always quit on CTRL+C or ESC
+        if (['\u0003', '\u001b'].indexOf(key) > -1) userCommand = 'quit';
+
+        switch (userCommand) {
+          case 'copyToClipboard':
+            copy(currentTitle);
+            break;
+
+          case 'addFavorite':
+            utils.addToFavourites(currentTitle);
+            currentFavourite = true;
+
+            logTitle(currentTime, currentTitleOut, true, true, currentlyRecording);
+            windowTitle(currentTitleOut, true, currentlyRecording);
+            break;
+
+          case 'removeFavorite':
+            utils.removeFromFavourites(currentTitle);
+            currentFavourite = false;
+
+            logTitle(currentTime, currentTitleOut, false, true, currentlyRecording);
+            windowTitle(currentTitleOut, false, currentlyRecording);
+            break;
+
+          case 'record':
+            currentlyRecording = true
+            somafm.getChannel(somafm.settings.currentChannelId)
+            .then(channel => {
+              record(channel);
+            })
+            .catch(err => {
+              console.error(err.toString());
+              process.exit(10);
+            });
+            break;
+
+          case 'increaseVolume':
+            if (player.keyPress) {
+              playerProc.stdin.write('*');
+              // playerProc.stdin.write('0');
+            }
+            break;
+
+          case 'decreaseVolume':
+            if (player.keyPress) {
+              playerProc.stdin.write('/');
+              // playerProc.stdin.write('9');
+            }
+            break;
+
+          case 'toggleMute':
+            if (player.keyPress) {
+              playerProc.stdin.write('m');
+            }
+            break;
+
+          case 'quit':
+            if (currentTitleOut) {
+              logTitle(currentTime, currentTitleOut, currentFavourite, currentlyPlaying, currentlyRecording);
+            }
+            logUpdate.done();
+
+            playerProc.kill();
+            break;
+
+          default:
+            break;
         }
       });
 

@@ -20,11 +20,34 @@ const GOT_OPTS = {
   }
 };
 
-const configName = (process.env.NODE_ENV === 'test' ? 'channels-test' : 'channels');
-const channelsConf = new CacheConf({projectName: pkg.name, configName});
+const channelConfigName = (process.env.NODE_ENV === 'test' ? 'channels-test' : 'channels');
+const settingsConfigName = (process.env.NODE_ENV === 'test' ? 'settings-test' : 'settings');
+const channelsConf = new CacheConf({projectName: pkg.name, channelConfigName});
+let settingsStore = new CacheConf();
+settingsStore.delete('settings');
+if (settingsStore.get('settings') === undefined) initSettings()
 
 const somafm = {};
 let channels = [];
+
+function initSettings() {
+  console.log('Loaded settings file: ' + settingsStore.path)
+  settingsStore.set({
+    settings: {
+      currentChannelId: '',
+      keyMap: {
+        'copyToClipboard': 'c',
+        'addFavorite': ['f', '+'],
+        'removeFavorite': ['u', '-'],
+        'increaseVolume': ['*', '0'],
+        'decreaseVolume': ['/', '9'],
+        'record': 'r',
+        'toggleMute': 'm',
+        'quit': ['q', 'esc']
+      }
+    }
+  })
+}
 
 function getChannels(options) {
   options = Object.assign({}, options);
@@ -203,5 +226,6 @@ function setCachedChannels(channels) {
 
 somafm.getChannels = getChannels;
 somafm.getChannel = getChannel;
+somafm.settings = settingsStore.get('settings');
 
 module.exports = somafm;
