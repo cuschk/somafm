@@ -124,18 +124,43 @@ function filterChannels(channels, search) {
 function applyFilter(channels, search) {
   return channels.filter(channel => {
     for (let i = 0; i < search.length; i++) {
-      const searchStr = String(search[i]).toLowerCase();
-      if (channel.id.toLowerCase().indexOf(searchStr) === -1 &&
-          channel.title.toLowerCase().indexOf(searchStr) === -1 &&
-          channel.description.toLowerCase().indexOf(searchStr) === -1 &&
-          channel.genre.toLowerCase().indexOf(searchStr) === -1 &&
-          channel.dj.toLowerCase().indexOf(searchStr) === -1) {
+      if (!isSubstringOfAny(String(search[i]).toLowerCase(), [
+        channel.id,
+        channel.title,
+        channel.description,
+        channel.genre,
+        channel.dj
+      ])) {
         return false;
       }
     }
 
     return true;
   });
+}
+
+function isSubstringOf(search, str) {
+  return str.toLowerCase().indexOf(search) > -1;
+}
+
+function isSubstringOfAll(search, arr) {
+  for (let i = 0; i < arr.length; i++) {
+    if (!isSubstringOf(search, arr[i])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isSubstringOfAny(search, arr) {
+  for (let i = 0; i < arr.length; i++) {
+    if (isSubstringOf(search, arr[i])) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function getChannel(id, options) {
