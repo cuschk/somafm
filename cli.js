@@ -12,6 +12,7 @@ const cliTruncate = require('cli-truncate');
 const copy = require('copy-paste').copy;
 const logUpdate = require('log-update');
 const cliCursor = require('cli-cursor');
+const notifier = require('node-notifier');
 const editor = require('editor');
 const figures = require('./figures');
 const utils = require('./utils');
@@ -208,6 +209,11 @@ function playChannel(channel) {
           logUpdate.done();
           logTitle(currentTime, currentTitleOut, currentFavourite, true);
           windowTitle(currentTitle, currentFavourite);
+          notify({
+            title: currentTitle,
+            message: channel.fullTitle,
+            icon: channel.imageFile
+          });
         }
       });
 
@@ -292,6 +298,10 @@ function windowTitle(title, favourite) {
   termTitle(`${favourite ? figures.heart : figures.play} ${title}`);
 }
 
+function notify(data) {
+  notifier.notify(data);
+}
+
 function record(channel) {
   return new Promise((resolve, reject) => {
     if (!isBin(streamripperBin)) {
@@ -342,6 +352,11 @@ function record(channel) {
 }
 
 function init() {
+  if (cli.flags.n) {
+    // Disable desktop notifications
+    notify = () => {};
+  }
+
   if (cli.input.length === 0) {
     interactive();
     return;

@@ -1,5 +1,9 @@
 'use strict';
+const fs = require('fs');
+const path = require('path');
 const got = require('got');
+const tempDir = require('temp-dir');
+const makeDir = require('make-dir');
 const ini = require('ini');
 const trim = require('trim');
 const CacheConf = require('cache-conf');
@@ -72,7 +76,8 @@ function parseJSONData(json, options) {
       genre: channel.genre.replace(/\|/g, '/'),
       lastPlaying: channel.lastPlaying,
       listeners: channel.listeners,
-      stream: streamHighestQuality
+      stream: streamHighestQuality,
+      image: channel.image
     };
     channels.push(channelObj);
   });
@@ -148,6 +153,17 @@ function getChannel(id, options) {
           return Promise.resolve(channel);
         })
         .catch(console.log);
+    })
+    .then(channel => {
+      const imageDir = path.join(tempDir, pkg.name);
+      channel.imageFile = path.join(imageDir, channel.id);
+
+      if (!fs.existsSync(channel.imageFile)) {
+        makeDir.sync(imageDir);
+        got.stream(channel.image).pipe(fs.createWriteStream(channel.imageFile));
+      }
+
+      return Promise.resolve(channel);
     });
 }
 
