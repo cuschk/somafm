@@ -22,15 +22,17 @@ $ npm install --global somafm
 
 ## Usage
 
-### `$ somafm`
+### Commands
+
+#### `$ somafm`
 
 Choose a channel to play from the list.
 
-### `$ somafm list [<keywords>]`
+#### `$ somafm list [<keywords>]`
 
 List [SomaFM channels](https://somafm.com/listen/). You can filter by one or more keywords.
 
-### `$ somafm play <channel>`
+#### `$ somafm play <channel>`
 
 Play a channel. Requires [MPlayer](https://mplayerhq.hu) or [mpv](https://mpv.io). Please make sure you have at least one of them installed and the `mplayer` or `mpv` command can be run within your shell.
 
@@ -48,22 +50,27 @@ Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
 
 <small>_* MPlayer only_</small>
 
-### `$ somafm info <channel>`
+#### `$ somafm info <channel>`
 
 Get channel information.
 
-### `$ somafm record <channel>`
+#### `$ somafm record <channel>`
 
 Record a channel. Requires [Streamripper](http://streamripper.sourceforge.net).
 
-### `$ somafm list-favourites`
+#### `$ somafm list-favourites`
 
 List your favourite songs.
 
-### `$ somafm edit-favourites`
+#### `$ somafm edit-favourites`
 
 Edit your favourites songs file.
 
+### Options
+
+#### `-n`
+
+Don't show desktop notifications.
 
 ## Command aliases
 

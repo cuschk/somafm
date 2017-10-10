@@ -20,7 +20,7 @@ const somafm = require('.');
 
 const cli = meow(`
   Usage
-    $ somafm [<command> <args>]
+    $ somafm [<command> <args>] [<options>]
 
   Example
     $ somafm
@@ -36,6 +36,9 @@ const cli = meow(`
     record <channel>    start recording channel
     list-favourites     list your favourite songs
     edit-favourites     edit your favourite songs
+
+  Options
+    -n   Don't show desktop notifications
 `, {
   alias: {
     h: 'help',
