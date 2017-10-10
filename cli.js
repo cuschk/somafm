@@ -213,7 +213,7 @@ function playChannel(channel) {
             title: currentTitle,
             message: channel.fullTitle,
             icon: channel.imageFile
-          });
+          }, currentFavourite);
         }
       });
 
@@ -298,7 +298,11 @@ function windowTitle(title, favourite) {
   termTitle(`${favourite ? figures.heart : figures.play} ${title}`);
 }
 
-function notify(data) {
+function notify(data, favourite) {
+  if (favourite) {
+    data.title = `${figures.heart} ${data.title}`;
+  }
+
   notifier.notify(data);
 }
 
