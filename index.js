@@ -143,16 +143,6 @@ function isSubstringOf(search, str) {
   return str.toLowerCase().indexOf(search) > -1;
 }
 
-function isSubstringOfAll(search, arr) {
-  for (let i = 0; i < arr.length; i++) {
-    if (!isSubstringOf(search, arr[i])) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 function isSubstringOfAny(search, arr) {
   for (let i = 0; i < arr.length; i++) {
     if (isSubstringOf(search, arr[i])) {

@@ -64,6 +64,14 @@ const streamripperBin = 'streamripper';
 
 const spinner = ora({color: 'yellow'});
 
+let notify = (data, favourite) => {
+  if (favourite) {
+    data.title = `${figures.heart} ${data.title}`;
+  }
+
+  notifier.notify(data);
+};
+
 function showChannelList(channels) {
   for (const channel of channels) {
     const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
@@ -314,14 +322,6 @@ function logTitle(time, title, favourite, playing) {
 
 function windowTitle(title, favourite) {
   termTitle(`${favourite ? figures.heart : figures.play} ${title}`);
-}
-
-function notify(data, favourite) {
-  if (favourite) {
-    data.title = `${figures.heart} ${data.title}`;
-  }
-
-  notifier.notify(data);
 }
 
 function record(channel) {
