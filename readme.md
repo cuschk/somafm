@@ -36,7 +36,7 @@ List [SomaFM channels](https://somafm.com/listen/). You can filter by one or mor
 
 Play a channel. Requires [MPlayer](https://mplayerhq.hu) or [mpv](https://mpv.io). Please make sure you have at least one of them installed and the `mplayer` or `mpv` command can be run within your shell.
 
-#### Keyboard shortcuts
+##### Keyboard shortcuts
 
 Description                          | Key
 ------------------------------------ | ------------------------------
@@ -66,13 +66,7 @@ List your favourite songs.
 
 Edit your favourites songs file.
 
-### Options
-
-#### `-n`
-
-Don't show desktop notifications.
-
-## Command aliases
+### Command aliases
 
 All commands have short aliases for faster typing.
 
@@ -84,6 +78,12 @@ Command           | Alias
 `record`          | `r`
 `list-favourites` | `lf`
 `edit-favourites` | `ef`
+
+### Options
+
+#### `-n`
+
+Don't show desktop notifications.
 
 
 ## License
