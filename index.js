@@ -70,7 +70,7 @@ function parseJSONData(json, options) {
     const channelObj = {
       id: channel.id,
       title: channel.title,
-      fullTitle: `SomaFM ${channel.title}`,
+      fullTitle: channel.title.startsWith('SomaFM') ? channel.title : `SomaFM ${channel.title}`,
       description: trim(channel.description),
       dj: channel.dj,
       genre: channel.genre.replace(/\|/g, '/'),
