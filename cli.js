@@ -152,7 +152,7 @@ function getPlayer() {
       }
     }
 
-    reject(new Error('No player executable found. Please ensure mpv or MPlayer is installed on your system and runnable within your shell.'));
+    reject(new Error('No player executable found. Please ensure MPlayer or mpv is installed on your system and runnable within your shell.'));
   });
 }
 
@@ -258,6 +258,7 @@ function interactive() {
   somafm.getChannels({sortChannels: true})
     .then(showPrompt)
     .then(answers => {
+      console.log();
       play(answers.channel);
     })
     .catch(err => {
