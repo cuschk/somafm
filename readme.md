@@ -2,7 +2,21 @@
 
 > Play & record [SomaFM](https://somafm.com) radio channels
 
-![](screenshot.png)
+![](media/screenshot.png)
+
+
+## Features
+
+<img src="media/notification.png" width="510" align="right" />
+
+- Play all [SomaFM channels](https://somafm.com/listen/) directly in your terminal.
+- Nice & clean output of playing song including timestamp and song history.
+- Desktop notifications on track change ([can be disabled](#-n)).
+- [Specify channel directly](#-somafm-play-channel) or use [interactive mode](#-somafm).
+- [Show channel list and search](#-somafm-list-keywords) by name and genre.
+- Hit <kbd>+</kbd> to instantly add playing song to [favourites list](#-somafm-list-favourites).
+- Copy current song title to clipboard by pressing <kbd>c</kbd>.
+- [Record channels](#-somafm-record-channel) and save tracks to your working directory.
 
 
 ## Install
@@ -19,6 +33,10 @@ or with [npm](https://www.npmjs.com):
 $ npm install --global somafm
 ```
 
+Playing a channel requires [MPlayer](https://mplayerhq.hu) or [mpv](https://mpv.io) on your system. Please make sure you have at least one of them installed and the `mplayer` or `mpv` command can be run within your shell.
+
+To record a channel, you need [Streamripper](http://streamripper.sourceforge.net) and its executable `streamripper`.
+
 
 ## Usage
 
@@ -26,23 +44,15 @@ $ npm install --global somafm
 
 #### `$ somafm`
 
-Choose a channel to play from the list.
+Interactive mode. Choose a channel to play from the list.
 
-#### `$ somafm list [<keywords>]`
-
-List [SomaFM channels](https://somafm.com/listen/). You can filter by one or more keywords.
-
-#### `$ somafm play <channel>`
-
-Play a channel. Requires [MPlayer](https://mplayerhq.hu) or [mpv](https://mpv.io). Please make sure you have at least one of them installed and the `mplayer` or `mpv` command can be run within your shell.
-
-##### Keyboard shortcuts
+##### Keyboard shortcuts while playing
 
 Description                          | Key
 ------------------------------------ | ------------------------------
 Copy current song title to clipboard | <kbd>c</kbd>
-Add current song to favourites       | <kbd>f</kbd> or <kbd>+</kbd>
-Remove current song from favourites  | <kbd>u</kbd> or <kbd>-</kbd>
+Add current song to favourites       | <kbd>+</kbd> or <kbd>f</kbd>
+Remove current song from favourites  | <kbd>-</kbd> or <kbd>u</kbd>
 Increase volume*                     | <kbd>\*</kbd> or <kbd>0</kbd>
 Decrease volume*                     | <kbd>/</kbd> or <kbd>9</kbd>
 Mute/unmute*                         | <kbd>m</kbd>
@@ -50,13 +60,21 @@ Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
 
 <small>_* MPlayer only_</small>
 
+#### `$ somafm list [<keywords>]`
+
+Show a list of all SomaFM channels. You can filter by one or more keywords.
+
+#### `$ somafm play <channel>`
+
+Play a channel. To specify a channel, use the ID from the channel list (lower-case, no spaces), e.g. `beatblender`.
+
 #### `$ somafm info <channel>`
 
 Get channel information.
 
 #### `$ somafm record <channel>`
 
-Record a channel. Requires [Streamripper](http://streamripper.sourceforge.net).
+Record a channel. Tracks are saved into a directory containing channel name, date and time, e.g. `SomaFM Groove Salad/20171011_213324`. It is automatically created in the current working directory.
 
 #### `$ somafm list-favourites`
 
