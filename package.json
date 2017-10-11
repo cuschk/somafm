@@ -58,6 +58,7 @@
     "make-dir": "^1.0.0",
     "meow": "^3.7.0",
     "node-notifier": "^5.1.2",
+    "ora": "^1.3.0",
     "temp-dir": "^1.0.0",
     "term-title": "^1.0.0",
     "trim": "0.0.1"

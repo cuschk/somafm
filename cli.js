@@ -3,6 +3,7 @@
 const childProcess = require('child_process');
 const chalk = require('chalk');
 const meow = require('meow');
+const ora = require('ora');
 const inquirer = require('inquirer');
 const isBin = require('isbin');
 const dateFormat = require('dateformat');
@@ -61,9 +62,9 @@ const players = [
 ];
 const streamripperBin = 'streamripper';
 
-function showChannelList(channels) {
-  console.log();
+const spinner = ora({color: 'yellow'});
 
+function showChannelList(channels) {
   for (const channel of channels) {
     const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
 
@@ -77,8 +78,7 @@ function showChannelList(channels) {
 
 function showChannel(channel) {
   console.log(
-  `
-  ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
+`  ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
 
   ${chalk.blue(channel.description)}
 
@@ -93,30 +93,45 @@ function showChannel(channel) {
 }
 
 function list(search) {
+  spinner.start('Loading channels');
+
   somafm.getChannels({search, sortChannels: true})
+    .then(channels => {
+      spinner.stop();
+      return Promise.resolve(channels);
+    })
     .then(showChannelList)
     .catch(err => {
-      console.error(err.toString());
+      spinner.fail(err.toString());
       process.exit(20);
     });
 }
 
 function info(channelId) {
+  spinner.start('Loading channel information');
+
   somafm.getChannel(channelId)
     .then(channel => {
+      spinner.stop();
       showChannel(channel);
     })
     .catch(err => {
-      console.error(err.toString());
+      spinner.fail(err.toString());
       process.exit(10);
     });
 }
 
 function play(channelId) {
+  spinner.start('Loading channel information');
+
   somafm.getChannel(channelId)
+    .then(channel => {
+      spinner.stop();
+      return channel;
+    })
     .then(playChannel)
     .catch(err => {
-      console.error(err.toString());
+      spinner.fail(err.toString());
       process.exit(10);
     });
 }
@@ -142,7 +157,7 @@ function playChannel(channel) {
       let currentFavourite;
 
       cliCursor.hide();
-      console.log(`\n  Playing   ${chalk.bold(channel.fullTitle)}\n`);
+      console.log(`  Playing   ${chalk.bold(channel.fullTitle)}\n`);
 
       const args = player.args.concat(channel.stream.urls[0]);
       const playerProc = childProcess.spawn(player.cmd, args);
@@ -325,9 +340,9 @@ function record(channel) {
     let currentTitle;
 
     cliCursor.hide();
-    console.log(`
-    Recording ${chalk.bold(channel.fullTitle)}
-    to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
+    console.log(
+`  Recording ${chalk.bold(channel.fullTitle)}
+  to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
     );
 
     streamripperProc.stdout.on('data', data => {
@@ -369,6 +384,8 @@ function init() {
     return;
   }
 
+  console.log();
+
   if (['list', 'ls', 'l'].indexOf(cli.input[0]) > -1) {
     list(cli.input.slice(1));
     return;
@@ -398,7 +415,6 @@ function init() {
 
   if (['list-favourites', 'list-favorites', 'lf'].indexOf(cli.input[0]) > -1) {
     utils.getFavourites().then(favourites => {
-      console.log();
       for (const title of favourites) {
         console.log(`  ${chalk.red(figures.heart)} ${title}`);
       }
