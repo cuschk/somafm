@@ -255,7 +255,13 @@ function playChannel(channel) {
 }
 
 function interactive() {
+  spinner.start('Loading channels');
+
   somafm.getChannels({sortChannels: true})
+    .then(channels => {
+      spinner.stop();
+      return channels;
+    })
     .then(showPrompt)
     .then(answers => {
       console.log();
@@ -380,12 +386,12 @@ function init() {
     notify = () => {};
   }
 
+  console.log();
+
   if (cli.input.length === 0) {
     interactive();
     return;
   }
-
-  console.log();
 
   if (['list', 'ls', 'l'].indexOf(cli.input[0]) > -1) {
     list(cli.input.slice(1));
