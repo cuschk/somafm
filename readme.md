@@ -46,20 +46,6 @@ To record a channel, you need [Streamripper](http://streamripper.sourceforge.net
 
 Interactive mode. Choose a channel to play from the list.
 
-##### Keyboard shortcuts while playing
-
-Description                          | Key
------------------------------------- | ------------------------------
-Copy current song title to clipboard | <kbd>c</kbd>
-Add current song to favourites       | <kbd>+</kbd> or <kbd>f</kbd>
-Remove current song from favourites  | <kbd>-</kbd> or <kbd>u</kbd>
-Increase volume*                     | <kbd>\*</kbd> or <kbd>0</kbd>
-Decrease volume*                     | <kbd>/</kbd> or <kbd>9</kbd>
-Mute/unmute*                         | <kbd>m</kbd>
-Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
-
-<small>_* MPlayer only_</small>
-
 #### `$ somafm list [<keywords>]`
 
 Show a list of all SomaFM channels. You can filter by one or more keywords.
@@ -102,6 +88,22 @@ Command           | Alias
 #### `-n`
 
 Don't show desktop notifications.
+
+### Keyboard shortcuts
+
+While playing, the following keyboard shortcuts are available:
+
+Description                          | Key
+------------------------------------ | ------------------------------
+Copy current song title to clipboard | <kbd>c</kbd>
+Add current song to favourites       | <kbd>+</kbd> or <kbd>f</kbd>
+Remove current song from favourites  | <kbd>-</kbd> or <kbd>u</kbd>
+Increase volume*                     | <kbd>\*</kbd> or <kbd>0</kbd>
+Decrease volume*                     | <kbd>/</kbd> or <kbd>9</kbd>
+Mute/unmute*                         | <kbd>m</kbd>
+Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
+
+<small>_* MPlayer only_</small>
 
 
 ## License
