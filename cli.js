@@ -165,7 +165,7 @@ function playChannel(channel) {
       let currentFavourite;
 
       cliCursor.hide();
-      console.log(`  Playing   ${chalk.bold(channel.fullTitle)}\n`);
+      console.log(`  Playing   ${chalk.bold(channel.fullTitle)}\n\n  ${chalk.blue(channel.description)}\n`);
 
       const args = player.args.concat(channel.stream.urls[0]);
       const playerProc = childProcess.spawn(player.cmd, args);
