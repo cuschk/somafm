@@ -225,11 +225,13 @@ function getCachedChannels() {
   return channelsConf.get('channels') || [];
 }
 
-function setCachedChannels(channels) {
-  // Cache channels for one minute
-  channelsConf.set('channels', channels, {maxAge: 60000});
+function setCachedChannels(data) {
+  channels = data;
 
-  return Promise.resolve(channels);
+  // Cache channels for one minute
+  channelsConf.set('channels', data, {maxAge: 60000});
+
+  return Promise.resolve(data);
 }
 
 somafm.getChannels = getChannels;
