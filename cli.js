@@ -285,7 +285,7 @@ function playChannel(channel) {
 
           // Overwrite last line
           if (currentTime) {
-            logTitle(currentTime, currentTitleOut, currentFavourite, currentlyRecording, currentLoved, somaAd);
+            logTitle(currentTime, currentTitleOut, currentFavourite, currentlyRecording, currentLoved);
           }
 
           currentTitle = title;
@@ -331,6 +331,10 @@ function loveSong(song) {
   });
 }
 
+function showHelp() {
+  console.log('This is the help!');
+}
+
 function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
@@ -370,9 +374,11 @@ function getLastFmObject (title) {
   };
 }
 
-function logTitle(time, title, favourite, playing, recording, loved, somaAd = false) {
+function logTitle(time, title, favourite, playing, recording, loved) {
   let state = 0;
   let prefix = '';
+
+  const somaAd = title.match(new RegExp(`SomaFM|Big Url|${title}`, 'i')) ? true : false;
 
   if (favourite) prefix += `${chalk.green(figures.favourite)} `;
   if (playing) prefix += `${chalk.green(figures.play)} `;
@@ -390,8 +396,8 @@ function logTitle(time, title, favourite, playing, recording, loved, somaAd = fa
 
     if (title !== previousTrack) {
       previousTrack = title;
-      currentLoved = false;
-      currentFavourite = false;
+      // currentLoved = false;
+      // currentFavourite = false;
       // TODO: Figure out why Now Playing is giving "invalid signature"
       Scrobbler.Scrobble(scrobble, function(response) {
         if (response.indexOf('lfm status="ok"') === -1) {

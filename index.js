@@ -46,7 +46,8 @@ function initSettings() {
 
       keyMap: {
         'copyToClipboard': 'c',
-        'lastFmLoveSong': 'h',
+        'lastFmLoveSong': 'l',
+        'help': ['h', '?'],
         'addFavorite': ['f', '+'],
         'removeFavorite': ['u', '-'],
         'increaseVolume': ['*', '0'],
@@ -236,6 +237,7 @@ function setCachedChannels(channels) {
 
 somafm.getChannels = getChannels;
 somafm.getChannel = getChannel;
+settingsStore.delete('settings');
 somafm.settings = settingsStore.get('settings');
 
 module.exports = somafm;
