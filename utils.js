@@ -4,7 +4,6 @@ const arrayUnion = require('array-union');
 
 const favouritesConf = new Conf({configName: 'favourites'});
 
-const utils = {};
 let favourites;
 
 function addFavouriteItem(title) {
@@ -21,7 +20,7 @@ function removeFavouriteItem(title) {
 }
 
 function readFavourites() {
-  favourites = favouritesConf.get('favourites') || [];
+  favourites = favouritesConf.get('favourites', []);
 }
 
 function writeFavourites() {
@@ -54,10 +53,10 @@ function getFavouritesFile() {
   return favouritesConf.path;
 }
 
-utils.isFavourite = isFavourite;
-utils.addToFavourites = addToFavourites;
-utils.removeFromFavourites = removeFromFavourites;
-utils.getFavourites = getFavourites;
-utils.getFavouritesFile = getFavouritesFile;
-
-module.exports = utils;
+module.exports = {
+  isFavourite,
+  addToFavourites,
+  removeFromFavourites,
+  getFavourites,
+  getFavouritesFile
+};

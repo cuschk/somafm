@@ -18,11 +18,7 @@ const PREFERRED_STREAMS = [
   {quality: 'low', format: 'mp3'}
 ];
 
-const GOT_OPTS = {
-  headers: {
-    'user-agent': `somafm/${pkg.version} (https://github.com/uschek/somafm)`
-  }
-};
+const GOT_OPTS = {headers: {'user-agent': `somafm/${pkg.version} (https://github.com/uschek/somafm)`}};
 
 const configName = (process.env.NODE_ENV === 'test' ? 'channels-test' : 'channels');
 const channelsConf = new CacheConf({projectName: pkg.name, configName});
@@ -57,17 +53,13 @@ function getChannelsFromAPI(options) {
 }
 
 function parseJSONData(json, options) {
-  json = JSON.parse(json);
-
-  const channelsRaw = options.sortChannels ?
-    json.channels.sort(compareChannelObjects) :
-    json.channels;
+  const data = JSON.parse(json).channels;
   const channels = [];
 
-  channelsRaw.forEach(channel => {
+  for (const channel of data) {
     const streamHighestQuality = getHighestQualityStream(channel, options.streams);
 
-    const channelObj = {
+    channels.push({
       id: channel.id,
       title: channel.title,
       fullTitle: channel.title.startsWith('SomaFM') ? channel.title : `SomaFM ${channel.title}`,
@@ -78,9 +70,12 @@ function parseJSONData(json, options) {
       listeners: channel.listeners,
       stream: streamHighestQuality,
       image: channel.image
-    };
-    channels.push(channelObj);
-  });
+    });
+  }
+
+  if (options.sortChannels) {
+    channels.sort(compareChannelObjects);
+  }
 
   return Promise.resolve(channels);
 }
@@ -90,18 +85,14 @@ function compareChannelObjects(a, b) {
 }
 
 function getHighestQualityStream(channel, streams) {
-  for (let i = 0; i < streams.length; i++) {
-    const stream = streams[i];
-
-    for (let j = 0; j < channel.playlists.length; j++) {
-      if (channel.playlists[j].quality === stream.quality && channel.playlists[j].format === stream.format) {
-        const res = {
-          url: channel.playlists[j].url,
-          format: channel.playlists[j].format,
-          quality: channel.playlists[j].quality
+  for (const stream of streams) {
+    for (const playlist of channel.playlists) {
+      if (playlist.quality === stream.quality && playlist.format === stream.format) {
+        return {
+          url: playlist.url,
+          format: playlist.format,
+          quality: playlist.quality
         };
-
-        return res;
       }
     }
   }
@@ -156,7 +147,6 @@ function isSubstringOfAny(search, arr) {
 function getChannel(id, options) {
   options = Object.assign({sortChannels: true}, options);
 
-  // TODO: get rid of callback hell
   return getChannels(options)
     .then(channels => getChannelById(id, channels))
     .then(channel => {
