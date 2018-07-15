@@ -334,7 +334,7 @@ function logTitle(time, title, favourite, playing) {
     default:
   }
 
-  logUpdate(`  ${time}  ${prefix}${title}`);
+  logUpdate(` ${time}  ${prefix}${title}`);
 }
 
 function windowTitle(title, favourite) {
