@@ -72,15 +72,25 @@ let notify = (data, favourite) => {
   notifier.notify(data);
 };
 
+function getWidth(stream) {
+  const columns = stream.columns;
+
+  if (!columns) {
+    return 80;
+  }
+
+  if (process.platform === 'win32') {
+    return columns - 1;
+  }
+
+  return columns;
+}
+
 function showChannelList(channels) {
   for (const channel of channels) {
     const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
 
-    if (process.stdout.columns) {
-      console.log(cliTruncate(str, process.stdout.columns - 1));
-    } else {
-      console.log(str);
-    }
+    console.log(cliTruncate(str, getWidth(process.stdout)));
   }
 }
 
