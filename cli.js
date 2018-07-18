@@ -341,7 +341,7 @@ function logTitle(time, title, favourite, playing) {
     default:
   }
 
-  logUpdate(` ${time}  ${prefix}${title}`);
+  logUpdate(` ${time}  ${prefix}${trim.left(indentString(wrapAnsi(title, getWidth(process.stdout) - 14), 13))}`);
 }
 
 function windowTitle(title, favourite) {
