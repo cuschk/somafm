@@ -88,7 +88,7 @@ function getWidth(stream) {
 
 function showChannelList(channels) {
   for (const channel of channels) {
-    const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${(channel.description)}`;
+    const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${channel.description}`;
 
     console.log(cliTruncate(str, getWidth(process.stdout)));
   }
@@ -297,12 +297,12 @@ function showPrompt(channels) {
       type: 'autocomplete',
       name: 'channel',
       message: 'Channel  ',
-      source: (answers, input) => Promise.resolve().then(() => filerLines(input, lines))
+      source: (answers, input) => Promise.resolve().then(() => filterLines(input, lines))
     }
   ]);
 }
 
-function filerLines(input, lines) {
+function filterLines(input, lines) {
   if (input !== null) {
     return lines.filter(channel => channel.name.toLowerCase().includes(input.toLowerCase()));
   }

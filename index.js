@@ -23,7 +23,6 @@ const GOT_OPTS = {headers: {'user-agent': `somafm/${pkg.version} (https://github
 const configName = (process.env.NODE_ENV === 'test' ? 'channels-test' : 'channels');
 const channelsConf = new CacheConf({projectName: pkg.name, configName});
 
-const somafm = {};
 let channels = [];
 
 function getChannels(options) {
@@ -114,8 +113,8 @@ function filterChannels(channels, search) {
 
 function applyFilter(channels, search) {
   return channels.filter(channel => {
-    for (let i = 0; i < search.length; i++) {
-      if (!isSubstringOfAny(String(search[i]).toLowerCase(), [
+    for (const str of search) {
+      if (!isSubstringOfAny(String(str).toLowerCase(), [
         channel.id,
         channel.title,
         channel.description,
@@ -130,18 +129,8 @@ function applyFilter(channels, search) {
   });
 }
 
-function isSubstringOf(search, str) {
-  return str.toLowerCase().indexOf(search) > -1;
-}
-
 function isSubstringOfAny(search, arr) {
-  for (let i = 0; i < arr.length; i++) {
-    if (isSubstringOf(search, arr[i])) {
-      return true;
-    }
-  }
-
-  return false;
+  return arr.some(str => str.toLowerCase().includes(search));
 }
 
 function getChannel(id, options) {
@@ -224,7 +213,7 @@ function setCachedChannels(data) {
   return Promise.resolve(data);
 }
 
-somafm.getChannels = getChannels;
-somafm.getChannel = getChannel;
-
-module.exports = somafm;
+module.exports = {
+  getChannels,
+  getChannel
+};
