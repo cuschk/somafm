@@ -1,6 +1,6 @@
 import test from 'ava';
 import execa from 'execa';
-import m from './';
+import m from '.';
 
 test.serial('fetch channels from API', async t => {
   const channels = await m.getChannels({forceUpdate: true});

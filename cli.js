@@ -10,7 +10,7 @@ const dateFormat = require('dateformat');
 const trim = require('trim');
 const termTitle = require('term-title');
 const cliTruncate = require('cli-truncate');
-const copy = require('copy-paste').copy;
+const {copy} = require('copy-paste');
 const logUpdate = require('log-update');
 const cliCursor = require('cli-cursor');
 const indentString = require('indent-string');
@@ -75,7 +75,7 @@ let notify = (data, favourite) => {
 };
 
 function getWidth(stream) {
-  const columns = stream.columns;
+  const columns = stream.columns; // eslint-disable-line prefer-destructuring
 
   if (!columns) {
     return 80;
@@ -98,7 +98,7 @@ function showChannelList(channels) {
 
 function showChannel(channel) {
   console.log(
-`  ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
+    `  ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
 
 ${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout) - 4), 2)}
 
@@ -118,7 +118,7 @@ function list(search) {
   somafm.getChannels({search, sortChannels: true})
     .then(channels => {
       spinner.stop();
-      return Promise.resolve(channels);
+      return channels;
     })
     .then(showChannelList)
     .catch(err => {
@@ -179,7 +179,7 @@ function playChannel(channel) {
       cliCursor.hide();
 
       console.log(
-`  Playing ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
+        `  Playing ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
 
 ${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout) - 4), 2)}
 `);
@@ -187,7 +187,7 @@ ${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout
       const args = player.args.concat(channel.stream.urls[0]);
       const playerProc = childProcess.spawn(player.cmd, args);
 
-      const stdin = process.stdin;
+      const stdin = process.stdin; // eslint-disable-line prefer-destructuring
       stdin.setRawMode(true);
       stdin.resume();
       stdin.setEncoding('utf-8');
@@ -218,7 +218,7 @@ ${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout
         }
 
         // `ctrl`+`c`, `esc`, `q`
-        if (['\u0003', '\u001b', 'q'].indexOf(key) > -1) {
+        if (['\u0003', '\u001B', 'q'].indexOf(key) > -1) {
           if (currentTitleOut) {
             logTitle(currentTime, currentTitleOut, currentFavourite);
           }
@@ -365,7 +365,7 @@ function record(channel) {
 
     cliCursor.hide();
     console.log(
-`  Recording ${chalk.bold(channel.fullTitle)}
+      `  Recording ${chalk.bold(channel.fullTitle)}
   to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
     );
 

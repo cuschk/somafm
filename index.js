@@ -189,7 +189,7 @@ function getUrlsFromPlaylist(playlistUrl) {
         const res = [];
 
         Object.keys(data.playlist)
-          .filter(x => x.match(/^File[0-9]+$/))
+          .filter(x => x.match(/^File\d+$/))
           .forEach(key => {
             res.push(data.playlist[key]);
           });
