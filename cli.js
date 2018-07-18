@@ -16,7 +16,7 @@ const cliCursor = require('cli-cursor');
 const indentString = require('indent-string');
 const wrapAnsi = require('wrap-ansi');
 const notifier = require('node-notifier');
-const editor = require('editor');
+const openEditor = require('open-editor');
 const figures = require('./figures');
 const utils = require('./utils');
 const somafm = require('.');
@@ -447,7 +447,7 @@ function init() {
   }
 
   if (['edit-favourites', 'edit-favorites', 'ef'].indexOf(cli.input[0]) > -1) {
-    editor(utils.getFavouritesFile());
+    openEditor([utils.getFavouritesFile()]);
     return;
   }
 
