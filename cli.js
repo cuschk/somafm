@@ -179,7 +179,7 @@ function playChannel(channel) {
       cliCursor.hide();
 
       console.log(
-        `  Playing ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
+        `  Playing   ${chalk.bold(channel.fullTitle)}
 
 ${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout) - 4), 2)}
 `);
