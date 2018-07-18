@@ -13,6 +13,8 @@ const cliTruncate = require('cli-truncate');
 const copy = require('copy-paste').copy;
 const logUpdate = require('log-update');
 const cliCursor = require('cli-cursor');
+const indentString = require('indent-string');
+const wrapAnsi = require('wrap-ansi');
 const notifier = require('node-notifier');
 const editor = require('editor');
 const figures = require('./figures');
@@ -98,7 +100,7 @@ function showChannel(channel) {
   console.log(
 `  ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
 
-  ${chalk.blue(channel.description)}
+${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout) - 4), 2)}
 
     ${chalk.yellow('Now playing')}   ${channel.lastPlaying}
 
@@ -175,7 +177,12 @@ function playChannel(channel) {
       let currentFavourite;
 
       cliCursor.hide();
-      console.log(`  Playing   ${chalk.bold(channel.fullTitle)}\n\n  ${chalk.blue(channel.description)}\n`);
+
+      console.log(
+`  Playing ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
+
+${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout) - 4), 2)}
+`);
 
       const args = player.args.concat(channel.stream.urls[0]);
       const playerProc = childProcess.spawn(player.cmd, args);
