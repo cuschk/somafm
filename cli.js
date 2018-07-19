@@ -96,13 +96,26 @@ function showChannelList(channels) {
   }
 }
 
+function wrap(str, options) {
+  options = Object.assign({
+    marginLeft: 2,
+    marginRight: 2,
+    trimFirstLine: false,
+    width: getWidth(process.stdout)
+  }, options);
+
+  const res = indentString(wrapAnsi(str, options.width - options.marginLeft - options.marginRight), options.marginLeft);
+
+  return options.trimFirstLine ? trim.left(res) : res;
+}
+
 function showChannel(channel) {
   console.log(
     `  ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]
 
-${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout) - 4), 2)}
+${wrap(chalk.blue(channel.description))}
 
-    ${chalk.yellow('Now playing')}   ${channel.lastPlaying}
+    ${chalk.yellow('Now playing')}   ${wrap(channel.lastPlaying, {marginLeft: 18, marginRight: 2, trimFirstLine: true})}
 
              ${chalk.yellow('DJ')}   ${channel.dj}
           ${chalk.yellow('Genre')}   ${channel.genre}
@@ -178,11 +191,8 @@ function playChannel(channel) {
 
       cliCursor.hide();
 
-      console.log(
-        `  Playing   ${chalk.bold(channel.fullTitle)}
-
-${indentString(wrapAnsi(chalk.blue(channel.description), getWidth(process.stdout) - 4), 2)}
-`);
+      console.log(`  Playing   ${chalk.bold(channel.fullTitle)}\n`);
+      console.log(wrap(`${chalk.blue(channel.description)}\n`));
 
       const args = player.args.concat(channel.stream.urls[0]);
       const playerProc = childProcess.spawn(player.cmd, args);
@@ -335,7 +345,13 @@ function logTitle(time, title, favourite, playing) {
     default:
   }
 
-  logUpdate(` ${time}  ${prefix}${trim.left(indentString(wrapAnsi(title, getWidth(process.stdout) - 14), 13))}`);
+  const outputOptions = {marginLeft: 11, marginRight: 3};
+
+  if (prefix.length) {
+    outputOptions.marginLeft += 2;
+  }
+
+  logUpdate(` ${time}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
 }
 
 function windowTitle(title, favourite) {
