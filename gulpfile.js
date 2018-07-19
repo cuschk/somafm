@@ -8,7 +8,7 @@ const vinylPaths = require('vinyl-paths');
 const del = require('del');
 const p = require('./package.json');
 
-const nodeVersion = '4';
+const nodeVersion = '6';
 
 const builds = [
   {src: `${p.name}-linux`, exec: p.name, zip: `${p.name}-${p.version}-linux.zip`},
