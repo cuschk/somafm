@@ -347,7 +347,7 @@ function logTitle(time, title, favourite, playing) {
 
   const outputOptions = {marginLeft: 11, marginRight: 3};
 
-  if (prefix.length) {
+  if (prefix.length > 0) {
     outputOptions.marginLeft += 2;
   }
 
