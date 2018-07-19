@@ -293,28 +293,22 @@ function interactive() {
 function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
-  const lines = channels.map(channel => ({
-    name: `${channel.title} (${chalk.blue(channel.genre)})`,
-    value: channel.id,
-    short: channel.title
-  }));
+  const lines = channels.map(channel => (
+    Object.assign(channel, {
+      name: `${channel.title} (${chalk.blue(channel.genre)})`,
+      value: channel.id,
+      short: channel.title
+    })
+  ));
 
   return inquirer.prompt([
     {
       type: 'autocomplete',
       name: 'channel',
       message: 'Channel  ',
-      source: (answers, input) => Promise.resolve().then(() => filterLines(input, lines))
+      source: (answers, input) => Promise.resolve().then(() => somafm.filterChannels(lines, input))
     }
   ]);
-}
-
-function filterLines(input, lines) {
-  if (input !== null) {
-    return lines.filter(channel => channel.name.toLowerCase().includes(input.toLowerCase()));
-  }
-
-  return lines;
 }
 
 function logTitle(time, title, favourite, playing) {

@@ -104,7 +104,7 @@ function filterChannels(channels, search) {
     if (Array.isArray(search) && search.length > 0) {
       resolve(applyFilter(channels, search));
     } else if (typeof search === 'string') {
-      resolve(applyFilter(channels, [search]));
+      resolve(applyFilter(channels, search.split(' ')));
     } else {
       resolve(channels);
     }
@@ -114,7 +114,7 @@ function filterChannels(channels, search) {
 function applyFilter(channels, search) {
   return channels.filter(channel => {
     for (const str of search) {
-      if (!isSubstringOfAny(String(str).toLowerCase(), [
+      if (!isSubstringOfAny(str.toLowerCase(), [
         channel.id,
         channel.title,
         channel.description,
@@ -215,5 +215,6 @@ function setCachedChannels(data) {
 
 module.exports = {
   getChannels,
-  getChannel
+  getChannel,
+  filterChannels
 };
