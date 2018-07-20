@@ -1,6 +1,5 @@
 'use strict';
 const Conf = require('conf');
-const pkg = require('./package.json');
 
 const favouritesConf = new Conf({configName: 'favourites'});
 
