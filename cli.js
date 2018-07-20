@@ -18,7 +18,7 @@ const wrapAnsi = require('wrap-ansi');
 const notifier = require('node-notifier');
 const openEditor = require('open-editor');
 const figures = require('./figures');
-const utils = require('./utils');
+const favourites = require('./favourites');
 const somafm = require('.');
 
 const cli = meow(`
@@ -212,7 +212,7 @@ function playChannel(channel) {
         }
 
         if (['f', '+'].indexOf(key) > -1) {
-          utils.addToFavourites(currentTitle);
+          favourites.addToFavourites(currentTitle);
           currentFavourite = true;
 
           logTitle(currentTime, currentTitleOut, true, true);
@@ -220,7 +220,7 @@ function playChannel(channel) {
         }
 
         if (['u', '-'].indexOf(key) > -1) {
-          utils.removeFromFavourites(currentTitle);
+          favourites.removeFromFavourites(currentTitle);
           currentFavourite = false;
 
           logTitle(currentTime, currentTitleOut, false, true);
@@ -257,7 +257,7 @@ function playChannel(channel) {
           currentTime = chalk.yellow(time);
           currentTitleOut = titleOut;
 
-          currentFavourite = utils.isFavourite(currentTitle);
+          currentFavourite = favourites.isFavourite(currentTitle);
 
           logUpdate.done();
           logTitle(currentTime, currentTitleOut, currentFavourite, true);
@@ -448,7 +448,7 @@ function init() {
   }
 
   if (['list-favourites', 'list-favorites', 'lf'].indexOf(cli.input[0]) > -1) {
-    utils.getFavourites().then(favourites => {
+    favourites.getFavourites().then(favourites => {
       for (const title of favourites) {
         console.log(`  ${chalk.red(figures.heart)} ${title}`);
       }
@@ -457,7 +457,7 @@ function init() {
   }
 
   if (['edit-favourites', 'edit-favorites', 'ef'].indexOf(cli.input[0]) > -1) {
-    openEditor([utils.getFavouritesFile()]);
+    openEditor([favourites.getFavouritesFile()]);
     return;
   }
 
