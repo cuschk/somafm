@@ -115,7 +115,7 @@ function showChannel(channel) {
 
 ${wrap(chalk.blue(channel.description))}
 
-    ${chalk.yellow('Now playing')}   ${wrap(channel.lastPlaying, {marginLeft: 18, marginRight: 2, trimFirstLine: true})}
+    ${chalk.yellow('Now playing')}   ${trim.left(wrap(channel.lastPlaying, {marginLeft: 18}))}
 
              ${chalk.yellow('DJ')}   ${channel.dj}
           ${chalk.yellow('Genre')}   ${channel.genre}
@@ -212,7 +212,7 @@ function playChannel(channel) {
         }
 
         if (['f', '+'].indexOf(key) > -1) {
-          favourites.addToFavourites(currentTitle);
+          favourites.addToFavourites({title: currentTitle, channel});
           currentFavourite = true;
 
           logTitle(currentTime, currentTitleOut, true, true);
@@ -449,8 +449,14 @@ function init() {
 
   if (['list-favourites', 'list-favorites', 'lf'].indexOf(cli.input[0]) > -1) {
     favourites.getFavourites().then(favourites => {
-      for (const title of favourites) {
-        console.log(`  ${chalk.red(figures.heart)} ${title}`);
+      for (const item of favourites) {
+        let output = typeof item === 'object' ? item.title : item;
+
+        if (item.channelTitle && item.channelTitle.length > 0) {
+          output += ` ${chalk.dim(`(${item.channelTitle})`)}`;
+        }
+
+        console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
       }
     });
     return;

@@ -1,62 +1,75 @@
 'use strict';
 const Conf = require('conf');
-const arrayUnion = require('array-union');
+const pkg = require('./package.json');
 
 const favouritesConf = new Conf({configName: 'favourites'});
 
 let favourites;
 
-function addFavouriteItem(title) {
-  favourites = arrayUnion(favourites, [title]);
-}
+const readFavourites = () => {
+  favourites = favouritesConf.get('favourites', []);
+};
 
-function removeFavouriteItem(title) {
+const writeFavourites = () => {
+  favouritesConf.set('favourites', favourites);
+};
+
+const getFavourites = () => {
+  readFavourites();
+  return Promise.resolve().then(() => favourites);
+};
+
+const getFavouritesFile = () => {
+  return favouritesConf.path;
+};
+
+const favFindFn = title => x => x === title || x.title === title;
+
+const getFavouriteItemIndexByTitle = title => favourites.findIndex(favFindFn(title));
+
+const isFavourite = title => {
+  readFavourites();
+  return getFavouriteItemIndexByTitle(title) > -1;
+};
+
+const addFavouriteItem = (item, timestamp) => {
+  timestamp = timestamp || Date.now();
+
+  if (!isFavourite(item)) {
+    favourites.push({
+      title: item.title,
+      channelTitle: item.channel.fullTitle,
+      channelId: item.channel.id,
+      timestamp
+    });
+  }
+};
+
+const removeFavouriteItem = title => {
   if (isFavourite(title)) {
-    const index = favourites.findIndex(x => x === title);
+    const index = getFavouriteItemIndexByTitle(title);
     if (index > -1) {
       favourites.splice(index, 1);
     }
   }
-}
+};
 
-function readFavourites() {
-  favourites = favouritesConf.get('favourites', []);
-}
-
-function writeFavourites() {
-  favouritesConf.set('favourites', favourites);
-}
-
-function isFavourite(title) {
+const addToFavourites = (item, timestamp) => {
   readFavourites();
-  return favourites.findIndex(x => x === title) > -1;
-}
-
-function addToFavourites(title) {
-  readFavourites();
-  addFavouriteItem(title);
+  addFavouriteItem(item, timestamp);
   writeFavourites();
-}
+};
 
-function removeFromFavourites(title) {
+const removeFromFavourites = title => {
   readFavourites();
   removeFavouriteItem(title);
   writeFavourites();
-}
-
-function getFavourites() {
-  readFavourites();
-  return Promise.resolve().then(() => favourites);
-}
-
-function getFavouritesFile() {
-  return favouritesConf.path;
-}
+};
 
 module.exports = {
-  isFavourite,
   addToFavourites,
   removeFromFavourites,
+  isFavourite,
   getFavourites,
   getFavouritesFile
 };
