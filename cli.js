@@ -6,7 +6,7 @@ const meow = require('meow');
 const ora = require('ora');
 const inquirer = require('inquirer');
 const isBin = require('isbin');
-const dateFormat = require('dateformat');
+const dateFormat = require('date-fns/format');
 const trim = require('trim');
 const termTitle = require('term-title');
 const cliTruncate = require('cli-truncate');
@@ -90,9 +90,9 @@ function getWidth(stream) {
 
 function showChannelList(channels) {
   for (const channel of channels) {
-    const str = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${channel.description}`;
+    const output = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`;
 
-    console.log(cliTruncate(str, getWidth(process.stdout)));
+    console.log(cliTruncate(output, getWidth(process.stdout)));
   }
 }
 
@@ -245,7 +245,7 @@ function playChannel(channel) {
         let title;
 
         if (res && (title = res[1])) {
-          const time = dateFormat(new Date(), 'HH:MM:ss');
+          const time = dateFormat(new Date(), 'HH:mm:ss');
           const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
 
           // Overwrite last line
@@ -364,7 +364,7 @@ function record(channel) {
       reject(new Error('Streamripper executable not found. Please ensure Streamripper is installed on your system and runnable with the "streamripper" command.'));
     }
 
-    const date = dateFormat(new Date(), 'yyyymmdd_HHMMss');
+    const date = dateFormat(new Date(), 'YYYYMMDD_HHmmss');
     const args = [
       channel.stream.url,
       '-D', `${channel.fullTitle}/${date}/%1q %A - %T`
@@ -394,7 +394,7 @@ function record(channel) {
           currentStatus = res[1];
           currentTitle = res[2];
 
-          const time = dateFormat(new Date(), 'HH:MM:ss');
+          const time = dateFormat(new Date(), 'HH:mm:ss');
           const status = res[1] === 'r' ? 'Recording' : 'Skipping ';
           console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
         }
@@ -453,7 +453,7 @@ function init() {
         let output = typeof item === 'object' ? item.title : item;
 
         if (item.channelTitle && item.channelTitle.length > 0) {
-          output += ` ${chalk.dim(`(${item.channelTitle})`)}`;
+          output += chalk.dim(' · ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
         }
 
         console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
