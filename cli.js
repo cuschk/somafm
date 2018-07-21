@@ -305,7 +305,7 @@ function showPrompt(channels) {
 
   const lines = channels.map(channel => (
     Object.assign(channel, {
-      name: `${channel.title} (${chalk.blue(channel.genre)})`,
+      name: cliTruncate(`${channel.title} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
       value: channel.id,
       short: channel.title
     })
