@@ -7,6 +7,7 @@ const makeDir = require('make-dir');
 const ini = require('ini');
 const trim = require('trim');
 const CacheConf = require('cache-conf');
+const utils = require('./utils');
 const pkg = require('./package.json');
 
 const PREFERRED_STREAMS = [
@@ -114,7 +115,7 @@ function filterChannels(channels, search) {
 function applyFilter(channels, search) {
   return channels.filter(channel => {
     for (const str of search) {
-      if (!isSubstringOfAny(str.toLowerCase(), [
+      if (!utils.isSubstringOfAny(str.toLowerCase(), [
         channel.id,
         channel.title,
         channel.description,
@@ -127,10 +128,6 @@ function applyFilter(channels, search) {
 
     return true;
   });
-}
-
-function isSubstringOfAny(search, arr) {
-  return arr.some(str => str.toLowerCase().includes(search));
 }
 
 function getChannel(id, options) {

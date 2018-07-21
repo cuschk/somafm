@@ -19,6 +19,7 @@ const notifier = require('node-notifier');
 const openEditor = require('open-editor');
 const figures = require('./figures');
 const favourites = require('./favourites');
+const utils = require('./utils');
 const somafm = require('.');
 
 const cli = meow(`
@@ -27,21 +28,35 @@ const cli = meow(`
 
   Example
     $ somafm
+    $ somafm -n
     $ somafm list
     $ somafm list ambient
     $ somafm info groovesalad
     $ somafm play fluid
 
   Commands
-    list [<keywords>]   list channels, optionally filter by keywords
-    info <channel>      show channel information
-    play <channel>      play channel
-    record <channel>    start recording channel
-    list-favourites     list your favourite songs
-    edit-favourites     edit your favourite songs
+    list | ls [<keywords>]   List channels, optionally filter by keywords
+    info | i <channel>       Show channel information
+    play | p <channel>       Play channel
+    record | r <channel>     Start recording channel
+    list-favourites | lf     List your favourite songs
+    edit-favourites | ef     Edit your favourite songs
 
   Options
     -n   Don't show desktop notifications
+
+  Keyboard shortcuts
+    When playing, the following keyboard shortcuts are available:
+
+    c         Copy current song title to clipboard
+    + | f     Add current song to favourites
+    - | u     Remove current song from favourites
+    * | 0     Increase volume*
+    / | 9     Decrease volume*
+    m         Mute/unmute*
+    q | esc   Stop playback & quit application
+
+    * MPlayer only
 `, {
   alias: {
     h: 'help',
@@ -407,6 +422,20 @@ function record(channel) {
   });
 }
 
+function listFavourites() {
+  favourites.getFavourites().then(favourites => {
+    for (const item of favourites) {
+      let output = typeof item === 'object' ? item.title : item;
+
+      if (item.channelTitle && item.channelTitle.length > 0) {
+        output += chalk.dim(' · ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
+      }
+
+      console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
+    }
+  });
+}
+
 function init() {
   if (cli.flags.n) {
     // Disable desktop notifications
@@ -415,28 +444,30 @@ function init() {
 
   console.log();
 
-  if (cli.input.length === 0) {
+  const [command, ...params] = cli.input;
+
+  if (!command && !cli.flags.v && !cli.flags.h) {
     interactive();
     return;
   }
 
-  if (['list', 'ls', 'l'].indexOf(cli.input[0]) > -1) {
+  if (utils.equalsAny(command, ['list', 'ls', 'l'])) {
     list(cli.input.slice(1));
     return;
   }
 
-  if (['info', 'i'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
-    info(cli.input[1]);
+  if (utils.equalsAny(command, ['info', 'i']) && params.length > 0) {
+    info(params[0]);
     return;
   }
 
-  if (['play', 'p'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
-    play(cli.input[1]);
+  if (utils.equalsAny(command, ['play', 'p']) && params.length > 0) {
+    play(params[0]);
     return;
   }
 
-  if (['record', 'r'].indexOf(cli.input[0]) > -1 && cli.input[1]) {
-    somafm.getChannel(cli.input[1])
+  if (utils.equalsAny(command, ['record', 'r']) && params.length > 0) {
+    somafm.getChannel(params[0])
       .then(channel => {
         record(channel);
       })
@@ -447,22 +478,12 @@ function init() {
     return;
   }
 
-  if (['list-favourites', 'list-favorites', 'lf'].indexOf(cli.input[0]) > -1) {
-    favourites.getFavourites().then(favourites => {
-      for (const item of favourites) {
-        let output = typeof item === 'object' ? item.title : item;
-
-        if (item.channelTitle && item.channelTitle.length > 0) {
-          output += chalk.dim(' · ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
-        }
-
-        console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
-      }
-    });
+  if (utils.equalsAny(command, ['list-favourites', 'list-favorites', 'lf'])) {
+    listFavourites();
     return;
   }
 
-  if (['edit-favourites', 'edit-favorites', 'ef'].indexOf(cli.input[0]) > -1) {
+  if (utils.equalsAny(command, ['edit-favourites', 'edit-favorites', 'ef'])) {
     openEditor([favourites.getFavouritesFile()]);
     return;
   }
