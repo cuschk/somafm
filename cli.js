@@ -103,25 +103,23 @@ function getWidth(stream) {
   return columns;
 }
 
-function showChannelList(channels) {
-  for (const channel of channels) {
-    const output = `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`;
-
-    console.log(cliTruncate(output, getWidth(process.stdout)));
-  }
-}
-
 function wrap(str, options) {
   options = Object.assign({
+    width: getWidth(process.stdout),
     marginLeft: 2,
-    marginRight: 2,
-    trimFirstLine: false,
-    width: getWidth(process.stdout)
+    marginRight: 2
   }, options);
 
-  const res = indentString(wrapAnsi(str, options.width - options.marginLeft - options.marginRight), options.marginLeft);
+  return indentString(wrapAnsi(str, options.width - options.marginLeft - options.marginRight), options.marginLeft);
+}
 
-  return options.trimFirstLine ? trim.left(res) : res;
+function showChannelList(channels) {
+  for (const channel of channels) {
+    console.log(cliTruncate(
+      `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${channel.description}`,
+      getWidth(process.stdout)
+    ));
+  }
 }
 
 function showChannel(channel) {
@@ -331,7 +329,7 @@ function showPrompt(channels) {
       type: 'autocomplete',
       name: 'channel',
       message: 'Channel  ',
-      source: (answers, input) => Promise.resolve().then(() => somafm.filterChannels(lines, input))
+      source: (answers, input) => somafm.filterChannels(lines, input)
     }
   ]);
 }
