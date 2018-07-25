@@ -116,7 +116,7 @@ function wrap(str, options) {
 function showChannelList(channels) {
   for (const channel of channels) {
     console.log(cliTruncate(
-      `${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) - ${channel.description}`,
+      `  ${chalk.bold(channel.title)} [${chalk.green(channel.id)}] (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`,
       getWidth(process.stdout)
     ));
   }
@@ -318,7 +318,7 @@ function showPrompt(channels) {
 
   const lines = channels.map(channel => (
     Object.assign(channel, {
-      name: cliTruncate(`${channel.title} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
+      name: cliTruncate(`${chalk.bold(channel.title)} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
       value: channel.id,
       short: channel.title
     })
@@ -426,7 +426,7 @@ function listFavourites() {
       let output = typeof item === 'object' ? item.title : item;
 
       if (item.channelTitle && item.channelTitle.length > 0) {
-        output += chalk.dim(' · ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
+        output += ' ' + chalk.dim('· ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
       }
 
       console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
