@@ -35,12 +35,18 @@ const cli = meow(`
     $ somafm play fluid
 
   Commands
-    list | ls [<keywords>]   List channels, optionally filter by keywords
-    info | i <channel>       Show channel information
-    play | p <channel>       Play channel
-    record | r <channel>     Start recording channel
-    list-favourites | lf     List your favourite songs
-    edit-favourites | ef     Edit your favourite songs
+    list | ls [<keywords>]
+              List channels, optionally filter by keywords
+    info | i <channel>
+              Show channel information
+    play | p <channel>
+              Play channel
+    record | r <channel>
+              Start recording channel
+    list-favourites | lf [<keywords>]
+              List your favourite songs, optionally filter by keywords
+    edit-favourites | ef
+              Edit your favourite songs
 
   Options
     -n   Don't show desktop notifications
@@ -420,10 +426,10 @@ function record(channel) {
   });
 }
 
-function listFavourites() {
-  favourites.getFavourites().then(favourites => {
-    for (const item of favourites) {
-      let output = typeof item === 'object' ? item.title : item;
+function listFavourites(search) {
+  favourites.getFavourites({search}).then(favouriteItems => {
+    for (const item of favouriteItems) {
+      let output = favourites.isObject(item) ? item.title : item;
 
       if (item.channelTitle && item.channelTitle.length > 0) {
         output += ' ' + chalk.dim('· ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
@@ -477,7 +483,7 @@ function init() {
   }
 
   if (utils.equalsAny(command, ['list-favourites', 'list-favorites', 'lf'])) {
-    listFavourites();
+    listFavourites(cli.input.slice(1));
     return;
   }
 

@@ -62,9 +62,9 @@ Get channel information.
 
 Record a channel. Tracks are saved into a directory containing channel name, date and time, e.g. `SomaFM Groove Salad/20171011_213324`. It is automatically created in the current working directory.
 
-#### `$ somafm list-favourites`
+#### `$ somafm list-favourites [<keywords>]`
 
-List your favourite songs.
+List your favourite songs. You can filter by one or more keywords in song title and channel name.
 
 #### `$ somafm edit-favourites`
 

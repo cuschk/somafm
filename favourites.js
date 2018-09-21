@@ -1,5 +1,6 @@
 'use strict';
 const Conf = require('conf');
+const utils = require('./utils');
 
 const favouritesConf = new Conf({configName: 'favourites'});
 
@@ -13,9 +14,29 @@ const writeFavourites = () => {
   favouritesConf.set('favourites', favourites);
 };
 
-const getFavourites = () => {
+const isObject = item => typeof item === 'object';
+
+const filterFavourites = (favourites, search) => {
+  return Promise.resolve(favourites.filter(item => {
+    let itemSearchList = [];
+
+    if (isObject(item)) {
+      itemSearchList = [item.title, item.channelId, item.channelTitle];
+    } else {
+      itemSearchList = [item];
+    }
+
+    return utils.searchArrayMatchesAny(search, itemSearchList);
+  }));
+};
+
+const getFavourites = options => {
+  options = Object.assign({}, options);
+
   readFavourites();
-  return Promise.resolve().then(() => favourites);
+
+  return Promise.resolve(favourites)
+    .then(favourites => filterFavourites(favourites, options.search));
 };
 
 const getFavouritesFile = () => {
@@ -66,6 +87,7 @@ const removeFromFavourites = title => {
 };
 
 module.exports = {
+  isObject,
   addToFavourites,
   removeFromFavourites,
   isFavourite,

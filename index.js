@@ -113,21 +113,9 @@ function filterChannels(channels, search) {
 }
 
 function applyFilter(channels, search) {
-  return channels.filter(channel => {
-    for (const str of search) {
-      if (!utils.isSubstringOfAny(str.toLowerCase(), [
-        channel.id,
-        channel.title,
-        channel.description,
-        channel.genre,
-        channel.dj
-      ])) {
-        return false;
-      }
-    }
-
-    return true;
-  });
+  return channels.filter(channel => utils.searchArrayMatchesAny(
+    search, [channel.id, channel.title, channel.description, channel.genre, channel.dj]
+  ));
 }
 
 function getChannel(id, options) {
