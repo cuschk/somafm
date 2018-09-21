@@ -123,17 +123,19 @@ function getChannel(id, options) {
 
   return getChannels(options)
     .then(channels => getChannelById(id, channels))
-    .then(channel => {
+    .then(channel => new Promise(resolve => {
       return getStreamUrls(channel)
         .then(urls => {
           channel.stream.urls = urls;
-          setCachedChannels(channels);
 
-          return Promise.resolve(channel);
+          setCachedChannels(channels)
+            .then(() => {
+              resolve(channel);
+            });
         })
         .catch(console.log);
-    })
-    .then(channel => {
+    }))
+    .then(channel => new Promise(resolve => {
       const imageDir = path.join(tempDir, pkg.name);
       channel.imageFile = path.join(imageDir, channel.id);
 
@@ -142,8 +144,8 @@ function getChannel(id, options) {
         got.stream(channel.image).pipe(fs.createWriteStream(channel.imageFile));
       }
 
-      return Promise.resolve(channel);
-    });
+      resolve(channel);
+    }));
 }
 
 function getChannelById(id, channels) {
@@ -190,12 +192,14 @@ function getCachedChannels() {
 }
 
 function setCachedChannels(data) {
-  channels = data;
+  return new Promise(resolve => {
+    channels = data;
 
-  // Cache channels for one minute
-  channelsConf.set('channels', data, {maxAge: 60000});
+    // Cache channels for one minute
+    channelsConf.set('channels', data, {maxAge: 60000});
 
-  return Promise.resolve(data);
+    resolve(data);
+  });
 }
 
 module.exports = {
