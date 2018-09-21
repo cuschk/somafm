@@ -124,7 +124,7 @@ function getChannel(id, options) {
   return getChannels(options)
     .then(channels => getChannelById(id, channels))
     .then(channel => new Promise(resolve => {
-      return getStreamUrls(channel)
+      getStreamUrls(channel)
         .then(urls => {
           channel.stream.urls = urls;
 
