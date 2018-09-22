@@ -341,27 +341,13 @@ function showPrompt(channels) {
 }
 
 function logTitle(time, title, favourite, playing) {
-  let state = 0;
   let prefix = '';
 
-  if (favourite) {
-    state++;
-  }
-  if (playing) {
-    state += 2;
-  }
+  if (playing || favourite) {
+    const colorFn = playing ? chalk.green : chalk.red;
+    const figure = favourite ? figures.heart : figures.play;
 
-  switch (state) {
-    case 1:
-      prefix = `${chalk.red(figures.heart)} `;
-      break;
-    case 2:
-      prefix = `${chalk.green(figures.play)} `;
-      break;
-    case 3:
-      prefix = `${chalk.green(figures.heart)} `;
-      break;
-    default:
+    prefix = `${colorFn(figure)} `;
   }
 
   const outputOptions = {marginLeft: 11, marginRight: 3};
