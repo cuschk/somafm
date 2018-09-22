@@ -63,12 +63,7 @@ const cli = meow(`
     q | esc   Stop playback & quit application
 
     * MPlayer only
-`, {
-  alias: {
-    h: 'help',
-    v: 'version'
-  }
-});
+`);
 
 const players = [
   {
@@ -478,8 +473,7 @@ function init() {
     return;
   }
 
-  cli.showHelp();
-  process.exit(1);
+  cli.showHelp(1);
 }
 
 init();
