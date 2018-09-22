@@ -18,12 +18,10 @@ const isObject = item => typeof item === 'object';
 
 const filterFavourites = (favourites, search) => {
   return Promise.resolve(favourites.filter(item => {
-    let itemSearchList = [];
+    let itemSearchList = [item];
 
     if (isObject(item)) {
       itemSearchList = [item.title, item.channelId, item.channelTitle];
-    } else {
-      itemSearchList = [item];
     }
 
     return utils.searchArrayMatchesAny(search, itemSearchList);
