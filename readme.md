@@ -108,4 +108,4 @@ Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
 
 ## License
 
-MIT © [Christoph Uschkrat](https://c.uschkrat.com)
+MIT © [Christoph Uschkrat](https://uschkrat.com)

@@ -7,7 +7,7 @@
   "author": {
     "name": "Christoph Uschkrat",
     "email": "christoph@uschkrat.com",
-    "url": "c.uschkrat.com"
+    "url": "uschkrat.com"
   },
   "bin": {
     "somafm": "cli.js"
