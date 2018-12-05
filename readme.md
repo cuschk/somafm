@@ -102,6 +102,8 @@ Remove current song from favourites  | <kbd>-</kbd> or <kbd>u</kbd>
 Increase volume*                     | <kbd>\*</kbd> or <kbd>0</kbd>
 Decrease volume*                     | <kbd>/</kbd> or <kbd>9</kbd>
 Mute/unmute*                         | <kbd>m</kbd>
+Enable desktop notifications         | <kbd>d</kbd>
+Disable desktop notifications        | <kbd>n</kbd>
 Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
 
 <small>_* MPlayer only_</small>

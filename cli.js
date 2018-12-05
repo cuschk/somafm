@@ -60,6 +60,8 @@ const cli = meow(`
     * | 0     Increase volume*
     / | 9     Decrease volume*
     m         Mute/unmute*
+    d         Enable desktop notifications
+    n         Disable desktop notifications
     q | esc   Stop playback & quit application
 
     * MPlayer only
@@ -82,13 +84,15 @@ const streamripperBin = 'streamripper';
 
 const spinner = ora({color: 'yellow'});
 
-let notify = (data, favourite) => {
+const showDesktopNotification = (data, favourite) => {
   if (favourite) {
     data.title = `${figures.heart} ${data.title}`;
   }
 
   notifier.notify(data);
 };
+const noop = () => {};
+let notify = showDesktopNotification;
 
 function getWidth(stream) {
   const columns = stream.columns; // eslint-disable-line prefer-destructuring
@@ -239,6 +243,16 @@ function playChannel(channel) {
 
           logTitle(currentTime, currentTitleOut, false, true);
           windowTitle(currentTitleOut);
+        }
+
+        if (['d', 'b'].indexOf(key) > -1) {
+          // Enable desktop notifications
+          notify = showDesktopNotification;
+        }
+
+        if (key === 'n') {
+          // Disable desktop notifications
+          notify = noop;
         }
 
         // `ctrl`+`c`, `esc`, `q`
@@ -424,7 +438,7 @@ function listFavourites(search) {
 function init() {
   if (cli.flags.n) {
     // Disable desktop notifications
-    notify = () => {};
+    notify = noop;
   }
 
   console.log();
