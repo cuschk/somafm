@@ -75,7 +75,7 @@ function parseJSONData(json, options) {
       dj: channel.dj,
       genre: channel.genre.replace(/\|/g, '/'),
       lastPlaying: channel.lastPlaying,
-      listeners: channel.listeners,
+      listeners: Number(channel.listeners),
       stream: streamHighestQuality,
       image: channel.image
     });
@@ -88,8 +88,8 @@ function parseJSONData(json, options) {
   return Promise.resolve(channels);
 }
 
-function compareChannelObjects(a, b) {
-  return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
+function compareChannelObjects(ch1, ch2) {
+  return Math.sign(ch2.listeners - ch1.listeners);
 }
 
 function getHighestQualityStream(channel, streams) {
