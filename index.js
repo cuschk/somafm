@@ -30,8 +30,16 @@ function getChannels(options) {
   options = Object.assign({}, options);
   options.streams = Object.assign(PREFERRED_STREAMS, options.streams);
 
+  const randomChannel = {
+    id: 'random',
+    title: 'Random',
+    description: 'Roll a dice and listen to any SomaFM channel. Best choice if you like being surprised.',
+    dj: 'Randomizer',
+    genre: 'random'
+  };
+
   return getChannelsFromAPIOrCache(options)
-    .then(channels => filterChannels(channels, options.search));
+    .then(channels => filterChannels([randomChannel, ...channels], options.search));
 }
 
 function getChannelsFromAPIOrCache(options) {

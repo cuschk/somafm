@@ -317,13 +317,6 @@ function interactive() {
 function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
-  channels.unshift({
-    id: 'random',
-    title: 'Random',
-    genre: 'random',
-    description: 'Roll a dice and listen to any SomaFM channel. Best choice if you like being surprised.'
-  });
-
   const lines = channels.map(channel => (
     Object.assign(channel, {
       name: cliTruncate(`${chalk.bold(channel.title)} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
