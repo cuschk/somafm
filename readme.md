@@ -10,11 +10,12 @@
 <img src="media/notification.png" width="510" align="right" />
 
 - Play all [SomaFM channels](https://somafm.com/listen/) directly in your terminal.
+- Play [random channel](#-somafm-play-channel-random).
 - Nice & clean output of playing song including timestamp and song history.
 - Desktop notifications on track change ([can be disabled](#-n)).
-- [Specify channel directly](#-somafm-play-channel) or use [interactive mode](#-somafm).
+- [Specify channel directly](#-somafm-play-channel-random) or use [interactive mode](#-somafm).
 - [Show channel list and search](#-somafm-list-keywords) by name and genre.
-- Hit <kbd>+</kbd> to instantly add playing song to [favourites list](#-somafm-list-favourites).
+- Hit <kbd>+</kbd> to instantly add playing song to [favourites list](#-somafm-list-favourites-keywords).
 - Copy current song title to clipboard by pressing <kbd>c</kbd>.
 - [Record channels](#-somafm-record-channel) and save tracks to your working directory.
 
@@ -50,9 +51,9 @@ Interactive mode. Choose a channel to play from the list.
 
 Show a list of all SomaFM channels. You can filter by one or more keywords.
 
-#### `$ somafm play <channel>`
+#### `$ somafm play <channel> | random`
 
-Play a channel. To specify a channel, use the ID from the channel list (lower-case, no spaces), e.g. `beatblender`.
+Play a channel. To specify a channel, use the ID from the channel list (lower-case, no spaces), e.g. `beatblender`. Use `random` to play any channel.
 
 #### `$ somafm info <channel>`
 

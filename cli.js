@@ -35,21 +35,21 @@ const cli = meow(`
     $ somafm play fluid
 
   Commands
-    list | ls [<keywords>]
+    list, ls [<keywords>]
               List channels, optionally filter by keywords
-    info | i <channel>
+    info, i <channel> | random
               Show channel information
-    play | p <channel>
+    play, p <channel> | random
               Play channel
-    record | r <channel>
+    record, r <channel> | random
               Start recording channel
-    list-favourites | lf [<keywords>]
+    list-favourites, lf [<keywords>]
               List your favourite songs, optionally filter by keywords
-    edit-favourites | ef
+    edit-favourites, ef
               Edit your favourite songs
 
   Options
-    -n   Don't show desktop notifications
+    -n        Don't show desktop notifications
 
   Keyboard shortcuts
     When playing, the following keyboard shortcuts are available:
@@ -205,7 +205,7 @@ function playChannel(channel) {
 
       cliCursor.hide();
 
-      console.log(`  Playing   ${chalk.bold(channel.fullTitle)}\n`);
+      console.log(`  Playing   ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]\n`);
       console.log(wrap(`${chalk.blue(channel.description)}\n`));
 
       const args = player.args.concat(channel.stream.urls[0]);
@@ -314,8 +314,31 @@ function interactive() {
     });
 }
 
+// Swap each letter with a random letter (can be the same one)
+function randomize(text) {
+  const swap = (text, index1, index2) => {
+    const h = text[index1];
+    text[index1] = text[index2];
+    text[index2] = h;
+  }
+
+  for (let i = 0; i < text.length; i++) {
+    const randomIndex = Math.floor(text.length * Math.random());
+    swap(text, i, randomIndex);
+  }
+
+  return text;
+}
+
 function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+
+  channels.unshift({
+    id: 'random',
+    title: 'Random',
+    genre: 'random',
+    description: 'Roll a dice and listen to any SomaFM channel. Best choice if you like being surprised.'
+  });
 
   const lines = channels.map(channel => (
     Object.assign(channel, {

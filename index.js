@@ -150,6 +150,12 @@ function getChannel(id, options) {
 
 function getChannelById(id, channels) {
   return new Promise((resolve, reject) => {
+    if (id === 'random') {
+      resolve(channels[
+        Math.floor(channels.length * Math.random())
+      ]);
+    }
+
     for (const channel of channels) {
       if (id.toLowerCase() === channel.id) {
         resolve(channel);
