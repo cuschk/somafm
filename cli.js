@@ -314,22 +314,6 @@ function interactive() {
     });
 }
 
-// Swap each letter with a random letter (can be the same one)
-function randomize(text) {
-  const swap = (text, index1, index2) => {
-    const h = text[index1];
-    text[index1] = text[index2];
-    text[index2] = h;
-  }
-
-  for (let i = 0; i < text.length; i++) {
-    const randomIndex = Math.floor(text.length * Math.random());
-    swap(text, i, randomIndex);
-  }
-
-  return text;
-}
-
 function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
