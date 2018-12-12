@@ -53,7 +53,7 @@ const isFavourite = title => {
 const addFavouriteItem = (item, timestamp) => {
   timestamp = timestamp || Date.now();
 
-  if (!isFavourite(item)) {
+  if (!isFavourite(item.title)) {
     favourites.push({
       title: item.title,
       channelTitle: item.channel.fullTitle,
