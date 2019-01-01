@@ -282,7 +282,7 @@ function playChannel(channel) {
           }
 
           currentTitle = title;
-          currentTime = chalk.yellow(time);
+          currentTime = time;
           currentTitleOut = titleOut;
 
           currentFavourite = favourites.isFavourite(currentTitle);
@@ -365,7 +365,7 @@ function logTitle(time, title, favourite, playing) {
     outputOptions.marginLeft += 2;
   }
 
-  logUpdate(` ${time}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
+  logUpdate(` ${chalk.dim(time)}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
 }
 
 function windowTitle(title, favourite) {
