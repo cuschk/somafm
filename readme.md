@@ -38,6 +38,8 @@ Playing a channel requires [MPlayer](https://mplayerhq.hu) or [mpv](https://mpv.
 
 To record a channel, you need [Streamripper](http://streamripper.sourceforge.net) and its executable `streamripper`.
 
+On Linux, the `xclip` package is needed to enable copying the current song title to the clipboard.
+
 
 ## Usage
 
