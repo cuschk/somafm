@@ -16,8 +16,8 @@ const writeFavourites = () => {
 
 const isObject = item => typeof item === 'object';
 
-const filterFavourites = (favourites, search) => {
-  return Promise.resolve(favourites.filter(item => {
+const filterFavourites = (favourites, search) =>
+  Promise.resolve(favourites.filter(item => {
     let itemSearchList = [item];
 
     if (isObject(item)) {
@@ -26,20 +26,16 @@ const filterFavourites = (favourites, search) => {
 
     return utils.searchArrayMatchesAny(search, itemSearchList);
   }));
-};
 
 const getFavourites = options => {
   options = Object.assign({}, options);
 
   readFavourites();
 
-  return Promise.resolve(favourites)
-    .then(favourites => filterFavourites(favourites, options.search));
+  return filterFavourites(favourites, options.search);
 };
 
-const getFavouritesFile = () => {
-  return favouritesConf.path;
-};
+const getFavouritesFile = () => favouritesConf.path;
 
 const favFindFn = title => x => x === title || x.title === title;
 
@@ -66,6 +62,7 @@ const addFavouriteItem = (item, timestamp) => {
 const removeFavouriteItem = title => {
   if (isFavourite(title)) {
     const index = getFavouriteItemIndexByTitle(title);
+
     if (index > -1) {
       favourites.splice(index, 1);
     }

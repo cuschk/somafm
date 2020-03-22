@@ -16,25 +16,20 @@ const builds = [
   {src: `${p.name}-win.exe`, exec: `${p.name}.exe`, zip: `${p.name}-${p.version}-win.zip`}
 ];
 
-const createZip = build => {
-  return gulp.src(`build/${build.src}`)
+const createZip = build =>
+  gulp.src(`build/${build.src}`)
     .pipe(vinylPaths(del))
     .pipe(rename(build.exec))
     .pipe(zip(build.zip))
     .pipe(gulp.dest('build'));
-};
 
-gulp.task('pkg', () => {
-  return pkg.exec(['.', '--out-path=build', `--targets=node${nodeVersion}-linux,node${nodeVersion}-macos,node${nodeVersion}-win`]);
-});
+gulp.task('pkg', () =>
+  pkg.exec(['.', '--out-path=build', `--targets=node${nodeVersion}-linux,node${nodeVersion}-macos,node${nodeVersion}-win`])
+);
 
-gulp.task('zip', ['pkg'], () => {
-  return pMap(builds, createZip);
-});
+gulp.task('zip', ['pkg'], () => pMap(builds, createZip));
 
-gulp.task('clean', () => {
-  return del('build');
-});
+gulp.task('clean', () => del('build'));
 
 gulp.task('build', ['pkg', 'zip']);
 gulp.task('default', ['build']);

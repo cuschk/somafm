@@ -319,13 +319,13 @@ async function interactive() {
 function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
-  const lines = channels.map(channel => (
-    Object.assign(channel, {
+  const lines = channels.map(channel => {
+    return Object.assign(channel, {
       name: cliTruncate(`${chalk.bold(channel.title)} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
       value: channel.id,
       short: channel.title
-    })
-  ));
+    });
+  });
 
   return inquirer.prompt([
     {
@@ -409,18 +409,18 @@ function record(channel) {
   });
 }
 
-function listFavourites(search) {
-  favourites.getFavourites({search}).then(favouriteItems => {
-    for (const item of favouriteItems) {
-      let output = favourites.isObject(item) ? item.title : item;
+async function listFavourites(search) {
+  const favouriteItems = await favourites.getFavourites({search});
 
-      if (item.channelTitle && item.channelTitle.length > 0) {
-        output += ' ' + chalk.dim('· ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
-      }
+  for (const item of favouriteItems) {
+    let output = favourites.isObject(item) ? item.title : item;
 
-      console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
+    if (item.channelTitle && item.channelTitle.length > 0) {
+      output += ' ' + chalk.dim('· ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
     }
-  });
+
+    console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
+  }
 }
 
 async function init() {
