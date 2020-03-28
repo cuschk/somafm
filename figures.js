@@ -1,11 +1,11 @@
 'use strict';
 const main = {
   play: '▶',
-  heart: '❤'
+  favourite: '❤'
 };
 
 const win = Object.assign(main, {
-  heart: '♥'
+  favourite: '♥'
 });
 
 module.exports = process.platform === 'win32' ? win : main;

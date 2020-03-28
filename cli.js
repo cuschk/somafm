@@ -86,7 +86,7 @@ const spinner = ora({color: 'yellow'});
 
 const showDesktopNotification = (data, favourite) => {
   if (favourite) {
-    data.title = `${figures.heart} ${data.title}`;
+    data.title = `${figures.favourite} ${data.title}`;
   }
 
   notifier.notify(data);
@@ -342,7 +342,7 @@ function logTitle(time, title, favourite, playing) {
 
   if (playing || favourite) {
     const colorFn = playing ? chalk.green : chalk.red;
-    const figure = favourite ? figures.heart : figures.play;
+    const figure = favourite ? figures.favourite : figures.play;
 
     prefix = `${colorFn(figure)} `;
   }
@@ -357,7 +357,7 @@ function logTitle(time, title, favourite, playing) {
 }
 
 function windowTitle(title, favourite) {
-  termTitle(`${favourite ? figures.heart : figures.play} ${title}`);
+  termTitle(`${favourite ? figures.favourite : figures.play} ${title}`);
 }
 
 function record(channel) {
@@ -419,7 +419,7 @@ async function listFavourites(search) {
       output += ' ' + chalk.dim('· ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
     }
 
-    console.log(`  ${chalk.red(figures.heart)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
+    console.log(`  ${chalk.red(figures.favourite)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
   }
 }
 
