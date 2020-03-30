@@ -139,6 +139,7 @@ ${wrap(chalk.blue(channel.description))}
           ${chalk.yellow('Genre')}   ${channel.genre}
       ${chalk.yellow('Listeners')}   ${channel.listeners}
 
+        ${chalk.yellow('Web URL')}   ${channel.web}
      ${chalk.yellow('Stream URL')}   ${channel.stream.urls[0]}`
   );
 }

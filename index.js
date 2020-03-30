@@ -73,6 +73,7 @@ function parseJSONData(json, options) {
       title: channel.title,
       fullTitle: channel.title.startsWith('SomaFM') ? channel.title : `SomaFM ${channel.title}`,
       description: trim(channel.description),
+      web: `https://somafm.com/${channel.id}/`,
       dj: channel.dj,
       genre: channel.genre.replace(/\|/g, '/'),
       lastPlaying: channel.lastPlaying,
