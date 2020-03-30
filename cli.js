@@ -143,48 +143,43 @@ ${wrap(chalk.blue(channel.description))}
   );
 }
 
-function list(search) {
+async function list(search) {
   spinner.start('Loading channels');
 
-  somafm.getChannels({search, sortChannels: true})
-    .then(channels => {
-      spinner.stop();
-      return channels;
-    })
-    .then(showChannelList)
-    .catch(err => {
-      spinner.fail(err.toString());
-      process.exit(20);
-    });
+  try {
+    const channels = await somafm.getChannels({search, sortChannels: true});
+    spinner.stop();
+    showChannelList(channels);
+  } catch (err) {
+    spinner.fail(err.toString());
+    process.exit(20);
+  }
 }
 
-function info(channelId) {
+async function info(channelId) {
   spinner.start('Loading channel information');
 
-  somafm.getChannel(channelId)
-    .then(channel => {
-      spinner.stop();
-      showChannel(channel);
-    })
-    .catch(err => {
-      spinner.fail(err.toString());
-      process.exit(10);
-    });
+  try {
+    const channel = await somafm.getChannel(channelId);
+    spinner.stop();
+    showChannel(channel);
+  } catch (err) {
+    spinner.fail(err.toString());
+    process.exit(10);
+  }
 }
 
-function play(channelId) {
+async function play(channelId) {
   spinner.start('Loading channel information');
 
-  somafm.getChannel(channelId)
-    .then(channel => {
-      spinner.stop();
-      return channel;
-    })
-    .then(playChannel)
-    .catch(err => {
-      spinner.fail(err.toString());
-      process.exit(10);
-    });
+  try {
+    const channel = await somafm.getChannel(channelId);
+    spinner.stop();
+    playChannel(channel);
+  } catch (err) {
+    spinner.fail(err.toString());
+    process.exit(10);
+  }
 }
 
 function getPlayer() {
@@ -199,133 +194,126 @@ function getPlayer() {
   });
 }
 
-function playChannel(channel) {
-  return getPlayer()
-    .then(player => {
-      let currentTitle = '';
-      let currentTitleOut;
-      let currentTime;
-      let currentFavourite;
+async function playChannel(channel) {
+  const player = await getPlayer();
+  let currentTitle = '';
+  let currentTitleOut;
+  let currentTime;
+  let currentFavourite;
 
-      cliCursor.hide();
+  cliCursor.hide();
 
-      console.log(`  Playing   ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]\n`);
-      console.log(wrap(`${chalk.blue(channel.description)}\n`));
+  console.log(`  Playing   ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]\n`);
+  console.log(wrap(`${chalk.blue(channel.description)}\n`));
 
-      const args = player.args.concat(channel.stream.urls[0]);
-      const playerProc = childProcess.spawn(player.cmd, args);
+  const args = player.args.concat(channel.stream.urls[0]);
+  const playerProc = childProcess.spawn(player.cmd, args);
 
-      const stdin = process.stdin; // eslint-disable-line prefer-destructuring
-      stdin.setRawMode(true);
-      stdin.resume();
-      stdin.setEncoding('utf-8');
+  const stdin = process.stdin; // eslint-disable-line prefer-destructuring
+  stdin.setRawMode(true);
+  stdin.resume();
+  stdin.setEncoding('utf-8');
 
-      stdin.on('data', key => {
-        if (player.keyPress && ['m', '9', '0', '/', '*'].indexOf(key) > -1) {
-          playerProc.stdin.write(key);
-        }
+  stdin.on('data', key => {
+    if (player.keyPress && ['m', '9', '0', '/', '*'].indexOf(key) > -1) {
+      playerProc.stdin.write(key);
+    }
 
-        if (key === 'c') {
-          copy(currentTitle);
-        }
+    if (key === 'c') {
+      copy(currentTitle);
+    }
 
-        if (['f', '+'].indexOf(key) > -1) {
-          favourites.addToFavourites({title: currentTitle, channel});
-          currentFavourite = true;
+    if (['f', '+'].indexOf(key) > -1) {
+      favourites.addToFavourites({title: currentTitle, channel});
+      currentFavourite = true;
 
-          logTitle(currentTime, currentTitleOut, true, true);
-          windowTitle(currentTitleOut, true);
-        }
+      logTitle(currentTime, currentTitleOut, true, true);
+      windowTitle(currentTitleOut, true);
+    }
 
-        if (['u', '-'].indexOf(key) > -1) {
-          favourites.removeFromFavourites(currentTitle);
-          currentFavourite = false;
+    if (['u', '-'].indexOf(key) > -1) {
+      favourites.removeFromFavourites(currentTitle);
+      currentFavourite = false;
 
-          logTitle(currentTime, currentTitleOut, false, true);
-          windowTitle(currentTitleOut);
-        }
+      logTitle(currentTime, currentTitleOut, false, true);
+      windowTitle(currentTitleOut);
+    }
 
-        if (['d', 'b'].indexOf(key) > -1) {
-          // Enable desktop notifications
-          notify = showDesktopNotification;
-        }
+    if (['d', 'b'].indexOf(key) > -1) {
+      // Enable desktop notifications
+      notify = showDesktopNotification;
+    }
 
-        if (key === 'n') {
-          // Disable desktop notifications
-          notify = noop;
-        }
+    if (key === 'n') {
+      // Disable desktop notifications
+      notify = noop;
+    }
 
-        // `ctrl`+`c`, `esc`, `q`
-        if (['\u0003', '\u001B', 'q'].indexOf(key) > -1) {
-          if (currentTitleOut) {
-            logTitle(currentTime, currentTitleOut, currentFavourite);
-          }
-          logUpdate.done();
+    // `ctrl`+`c`, `esc`, `q`
+    if (['\u0003', '\u001B', 'q'].indexOf(key) > -1) {
+      if (currentTitleOut) {
+        logTitle(currentTime, currentTitleOut, currentFavourite);
+      }
+      logUpdate.done();
 
-          playerProc.kill();
-        }
-      });
+      playerProc.kill();
+    }
+  });
 
-      playerProc.stdout.on('data', data => {
-        const line = trim(data.toString());
+  playerProc.stdout.on('data', data => {
+    const line = trim(data.toString());
 
-        const res = line.match(player.titleRegex);
-        let title;
+    const res = line.match(player.titleRegex);
+    let title;
 
-        if (res && (title = res[1])) {
-          const time = dateFormat(new Date(), 'HH:mm:ss');
-          const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
+    if (res && (title = res[1])) {
+      const time = dateFormat(new Date(), 'HH:mm:ss');
+      const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
 
-          // Overwrite last line
-          if (currentTime) {
-            logTitle(currentTime, currentTitleOut, currentFavourite);
-          }
+      // Overwrite last line
+      if (currentTime) {
+        logTitle(currentTime, currentTitleOut, currentFavourite);
+      }
 
-          currentTitle = title;
-          currentTime = time;
-          currentTitleOut = titleOut;
+      currentTitle = title;
+      currentTime = time;
+      currentTitleOut = titleOut;
 
-          currentFavourite = favourites.isFavourite(currentTitle);
+      currentFavourite = favourites.isFavourite(currentTitle);
 
-          logUpdate.done();
-          logTitle(currentTime, currentTitleOut, currentFavourite, true);
-          windowTitle(currentTitle, currentFavourite);
-          notify({
-            title: currentTitle,
-            message: channel.fullTitle,
-            icon: channel.imageFile
-          }, currentFavourite);
-        }
-      });
+      logUpdate.done();
+      logTitle(currentTime, currentTitleOut, currentFavourite, true);
+      windowTitle(currentTitle, currentFavourite);
+      notify({
+        title: currentTitle,
+        message: channel.fullTitle,
+        icon: channel.imageFile
+      }, currentFavourite);
+    }
+  });
 
-      playerProc.on('error', Promise.reject);
+  playerProc.on('error', Promise.reject);
 
-      playerProc.on('exit', () => {
-        termTitle();
-        process.exit(0);
-      });
+  playerProc.on('exit', () => {
+    termTitle();
+    process.exit(0);
+  });
 
-      return Promise.resolve();
-    });
+  return Promise.resolve();
 }
 
-function interactive() {
+async function interactive() {
   spinner.start('Loading channels');
 
-  somafm.getChannels({sortChannels: true})
-    .then(channels => {
-      spinner.stop();
-      return channels;
-    })
-    .then(showPrompt)
-    .then(answers => {
-      console.log();
-      play(answers.channel);
-    })
-    .catch(err => {
-      console.error(err.toString());
-      process.exit(20);
-    });
+  try {
+    const channels = await somafm.getChannels({sortChannels: true});
+    spinner.stop();
+    const answers = await showPrompt(channels);
+    play(answers.channel);
+  } catch (err) {
+    console.error(err.toString());
+    process.exit(20);
+  }
 }
 
 function showPrompt(channels) {
@@ -435,7 +423,7 @@ function listFavourites(search) {
   });
 }
 
-function init() {
+async function init() {
   if (cli.flags.n) {
     // Disable desktop notifications
     notify = noop;
@@ -466,19 +454,18 @@ function init() {
   }
 
   if (utils.equalsAny(command, ['record', 'r']) && params.length > 0) {
-    somafm.getChannel(params[0])
-      .then(channel => {
-        record(channel);
-      })
-      .catch(err => {
-        console.error(err.toString());
-        process.exit(10);
-      });
-    return;
+    try {
+      const channel = await somafm.getChannel(params[0]);
+      record(channel);
+      return;
+    } catch (err) {
+      console.error(err.toString());
+      process.exit(10);
+    }
   }
 
   if (utils.equalsAny(command, ['list-favourites', 'list-favorites', 'lf'])) {
-    listFavourites(cli.input.slice(1));
+    listFavourites(params);
     return;
   }
 

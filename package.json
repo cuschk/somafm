@@ -13,7 +13,7 @@
     "somafm": "cli.js"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "scripts": {
     "test": "xo && NODE_ENV=test ava",
