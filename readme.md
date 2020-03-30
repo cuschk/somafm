@@ -109,8 +109,3 @@ Disable desktop notifications        | <kbd>n</kbd>
 Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
 
 <small>_* MPlayer only_</small>
-
-
-## License
-
-MIT © [Christoph Uschkrat](https://uschkrat.com)
