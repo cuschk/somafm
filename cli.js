@@ -198,9 +198,7 @@ function getPlayer() {
 async function playChannel(channel) {
   const player = await getPlayer();
   let currentTitle = '';
-  let currentTitleOut;
-  let currentTime;
-  let currentFavourite;
+  let currentOptions = {};
 
   cliCursor.hide();
 
@@ -226,18 +224,20 @@ async function playChannel(channel) {
 
     if (['f', '+'].indexOf(key) > -1) {
       favourites.addToFavourites({title: currentTitle, channel});
-      currentFavourite = true;
 
-      logTitle(currentTime, currentTitleOut, true, true);
-      windowTitle(currentTitleOut, true);
+      logTitle(currentTitle, Object.assign(currentOptions, {
+        isPlaying: true,
+        isFavourite: true
+      }));
+      windowTitle(currentTitle, currentOptions.isFavourite);
     }
 
     if (['u', '-'].indexOf(key) > -1) {
       favourites.removeFromFavourites(currentTitle);
-      currentFavourite = false;
+      currentOptions.isFavourite = false;
 
-      logTitle(currentTime, currentTitleOut, false, true);
-      windowTitle(currentTitleOut);
+      logTitle(currentTitle, currentOptions);
+      windowTitle(currentTitle, currentOptions.isFavourite);
     }
 
     if (['d', 'b'].indexOf(key) > -1) {
@@ -252,8 +252,8 @@ async function playChannel(channel) {
 
     // `ctrl`+`c`, `esc`, `q`
     if (['\u0003', '\u001B', 'q'].indexOf(key) > -1) {
-      if (currentTitleOut) {
-        logTitle(currentTime, currentTitleOut, currentFavourite);
+      if (currentTitle) {
+        logTitle(currentTitle, Object.assign(currentOptions, {isPlaying: false}));
       }
       logUpdate.done();
 
@@ -269,27 +269,28 @@ async function playChannel(channel) {
 
     if (res && (title = res[1])) {
       const time = dateFormat(new Date(), 'HH:mm:ss');
-      const titleOut = title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i')) ? chalk.gray(title) : title;
 
       // Overwrite last line
-      if (currentTime) {
-        logTitle(currentTime, currentTitleOut, currentFavourite);
+      if (currentOptions.time) {
+        logTitle(currentTitle, Object.assign({}, currentOptions, {isPlaying: false}))
       }
 
       currentTitle = title;
-      currentTime = time;
-      currentTitleOut = titleOut;
-
-      currentFavourite = favourites.isFavourite(currentTitle);
+      currentOptions = {
+        time,
+        isPlaying: true,
+        isFavourite: favourites.isFavourite(currentTitle),
+        isAnnouncement: title.match(new RegExp(`SomaFM|Big Url|${channel.title}`, 'i'))
+      };
 
       logUpdate.done();
-      logTitle(currentTime, currentTitleOut, currentFavourite, true);
-      windowTitle(currentTitle, currentFavourite);
+      logTitle(currentTitle, currentOptions);
+      windowTitle(currentTitle, currentOptions.isFavourite);
       notify({
         title: currentTitle,
         message: channel.fullTitle,
         icon: channel.imageFile
-      }, currentFavourite);
+      }, currentOptions.isFavourite);
     }
   });
 
@@ -338,14 +339,25 @@ function showPrompt(channels) {
   ]);
 }
 
-function logTitle(time, title, favourite, playing) {
+function logTitle(title, options) {
+  options = Object.assign({
+    time: dateFormat(new Date(), 'HH:mm:ss'),
+    isPlaying: false,
+    isFavourite: false,
+    isAnnouncement: false
+  }, options);
+
   let prefix = '';
 
-  if (playing || favourite) {
-    const colorFn = playing ? chalk.green : chalk.red;
-    const figure = favourite ? figures.favourite : figures.play;
+  if (options.isPlaying || options.isFavourite) {
+    const colorFn = options.isPlaying ? chalk.green : chalk.red;
+    const figure = options.isFavourite ? figures.favourite : figures.play;
 
     prefix = `${colorFn(figure)} `;
+  }
+
+  if (options.isAnnouncement) {
+    title = chalk.gray(title);
   }
 
   const outputOptions = {marginLeft: 11, marginRight: 3};
@@ -354,11 +366,11 @@ function logTitle(time, title, favourite, playing) {
     outputOptions.marginLeft += 2;
   }
 
-  logUpdate(` ${chalk.dim(time)}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
+  logUpdate(` ${chalk.dim(options.time)}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
 }
 
-function windowTitle(title, favourite) {
-  termTitle(`${favourite ? figures.favourite : figures.play} ${title}`);
+function windowTitle(title, isFavourite) {
+  termTitle(`${isFavourite ? figures.favourite : figures.play} ${title}`);
 }
 
 function record(channel) {
