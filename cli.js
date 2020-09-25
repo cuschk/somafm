@@ -321,13 +321,12 @@ async function interactive() {
 function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
-  const lines = channels.map(channel => {
-    return Object.assign(channel, {
+  const lines = channels.map(channel => Object.assign(channel, {
       name: cliTruncate(`${chalk.bold(channel.title)} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
       value: channel.id,
       short: channel.title
-    });
-  });
+    })
+  );
 
   return inquirer.prompt([
     {
