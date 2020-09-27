@@ -272,7 +272,7 @@ async function playChannel(channel) {
 
       // Overwrite last line
       if (currentOptions.time) {
-        logTitle(currentTitle, Object.assign({}, currentOptions, {isPlaying: false}))
+        logTitle(currentTitle, Object.assign({}, currentOptions, {isPlaying: false}));
       }
 
       currentTitle = title;
@@ -322,10 +322,10 @@ function showPrompt(channels) {
   inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
   const lines = channels.map(channel => Object.assign(channel, {
-      name: cliTruncate(`${chalk.bold(channel.title)} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
-      value: channel.id,
-      short: channel.title
-    })
+    name: cliTruncate(`${chalk.bold(channel.title)} (${chalk.blue(channel.genre)}) ${chalk.dim('· ' + channel.description)}`, getWidth(process.stdout) - 3),
+    value: channel.id,
+    short: channel.title
+  })
   );
 
   return inquirer.prompt([
