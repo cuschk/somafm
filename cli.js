@@ -293,6 +293,7 @@ async function interactive() {
     const channels = await somafm.getChannels({sortChannels: true});
     spinner.stop();
     const answers = await showPrompt(channels);
+    console.log();
     play(answers.channel);
   } catch (error) {
     console.error(error.toString());
