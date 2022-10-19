@@ -137,7 +137,7 @@ async function getChannel(id, options) {
 
   channel.stream.urls = urls;
 
-  await setCachedChannels(channels.filter((channel) => channel.id !== 'random'));
+  await setCachedChannels(channels.filter(channel => channel.id !== 'random'));
 
   const imageDir = path.join(tempDir, pkg.name);
   channel.imageFile = path.join(imageDir, channel.id);
