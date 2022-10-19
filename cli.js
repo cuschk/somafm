@@ -17,9 +17,9 @@ const indentString = require('indent-string');
 const wrapAnsi = require('wrap-ansi');
 const notifier = require('node-notifier');
 const openEditor = require('open-editor');
-const figures = require('./figures');
-const favourites = require('./favourites');
-const utils = require('./utils');
+const figures = require('./figures.js');
+const favourites = require('./favourites.js');
+const utils = require('./utils.js');
 const somafm = require('.');
 
 const cli = meow(`
@@ -81,6 +81,7 @@ const showDesktopNotification = (data, favourite) => {
 
   notifier.notify(data);
 };
+
 const noop = () => {};
 let notify = noop;
 
@@ -98,14 +99,12 @@ function getWidth(stream) {
   return columns;
 }
 
-function wrap(str, options) {
-  options = Object.assign({
-    width: getWidth(process.stdout),
+function wrap(string_, options) {
+  options = {width: getWidth(process.stdout),
     marginLeft: 2,
-    marginRight: 2
-  }, options);
+    marginRight: 2, ...options};
 
-  return indentString(wrapAnsi(str, options.width - options.marginLeft - options.marginRight), options.marginLeft);
+  return indentString(wrapAnsi(string_, options.width - options.marginLeft - options.marginRight), options.marginLeft);
 }
 
 function showChannelList(channels) {
@@ -141,8 +140,8 @@ async function list(search) {
     const channels = await somafm.getChannels({search, sortChannels: true});
     spinner.stop();
     showChannelList(channels);
-  } catch (err) {
-    spinner.fail(err.toString());
+  } catch (error) {
+    spinner.fail(error.toString());
     process.exit(20);
   }
 }
@@ -154,8 +153,8 @@ async function info(channelId) {
     const channel = await somafm.getChannel(channelId);
     spinner.stop();
     showChannel(channel);
-  } catch (err) {
-    spinner.fail(err.toString());
+  } catch (error) {
+    spinner.fail(error.toString());
     process.exit(10);
   }
 }
@@ -167,8 +166,8 @@ async function play(channelId) {
     const channel = await somafm.getChannel(channelId);
     spinner.stop();
     playChannel(channel);
-  } catch (err) {
-    spinner.fail(err.toString());
+  } catch (error) {
+    spinner.fail(error.toString());
     process.exit(10);
   }
 }
@@ -193,7 +192,7 @@ async function playChannel(channel) {
   console.log(`  Playing   ${chalk.bold(channel.fullTitle)} [${chalk.green(channel.id)}]\n`);
   console.log(wrap(`${chalk.blue(channel.description)}\n`));
 
-  const args = player.args.concat(channel.stream.urls[0]);
+  const args = [...player.args, channel.stream.urls[0]];
   const playerProc = childProcess.spawn(player.cmd, args);
 
   const stdin = process.stdin; // eslint-disable-line prefer-destructuring
@@ -206,7 +205,7 @@ async function playChannel(channel) {
       copy(currentTitle);
     }
 
-    if (['f', '+'].indexOf(key) > -1) {
+    if (['f', '+'].includes(key)) {
       favourites.addToFavourites({title: currentTitle, channel});
 
       logTitle(currentTitle, Object.assign(currentOptions, {
@@ -216,7 +215,7 @@ async function playChannel(channel) {
       windowTitle(currentTitle, currentOptions.isFavourite);
     }
 
-    if (['u', '-'].indexOf(key) > -1) {
+    if (['u', '-'].includes(key)) {
       favourites.removeFromFavourites(currentTitle);
       currentOptions.isFavourite = false;
 
@@ -235,10 +234,11 @@ async function playChannel(channel) {
     }
 
     // `ctrl`+`c`, `esc`, `q`
-    if (['\u0003', '\u001B', 'q'].indexOf(key) > -1) {
+    if (['\u0003', '\u001B', 'q'].includes(key)) {
       if (currentTitle) {
         logTitle(currentTitle, Object.assign(currentOptions, {isPlaying: false}));
       }
+
       logUpdate.done();
 
       playerProc.kill();
@@ -248,15 +248,15 @@ async function playChannel(channel) {
   playerProc.stdout.on('data', data => {
     const line = trim(data.toString());
 
-    const res = line.match(player.titleRegex);
+    const result = line.match(player.titleRegex);
     let title;
 
-    if (res && (title = res[1])) {
+    if (result && (title = result[1])) {
       const time = dateFormat(new Date(), 'HH:mm:ss');
 
       // Overwrite last line
       if (currentOptions.time) {
-        logTitle(currentTitle, Object.assign({}, currentOptions, {isPlaying: false}));
+        logTitle(currentTitle, {...currentOptions, isPlaying: false});
       }
 
       currentTitle = title;
@@ -284,8 +284,6 @@ async function playChannel(channel) {
     termTitle();
     process.exit(0);
   });
-
-  return Promise.resolve();
 }
 
 async function interactive() {
@@ -296,8 +294,8 @@ async function interactive() {
     spinner.stop();
     const answers = await showPrompt(channels);
     play(answers.channel);
-  } catch (err) {
-    console.error(err.toString());
+  } catch (error) {
+    console.error(error.toString());
     process.exit(20);
   }
 }
@@ -323,12 +321,10 @@ function showPrompt(channels) {
 }
 
 function logTitle(title, options) {
-  options = Object.assign({
-    time: dateFormat(new Date(), 'HH:mm:ss'),
+  options = {time: dateFormat(new Date(), 'HH:mm:ss'),
     isPlaying: false,
     isFavourite: false,
-    isAnnouncement: false
-  }, options);
+    isAnnouncement: false, ...options};
 
   let prefix = '';
 
@@ -365,7 +361,8 @@ function record(channel) {
     const date = dateFormat(new Date(), 'YYYYMMDD_HHmmss');
     const args = [
       channel.stream.url,
-      '-D', `${channel.fullTitle}/${date}/%1q %A - %T`
+      '-D',
+      `${channel.fullTitle}/${date}/%1q %A - %T`
     ];
     const streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
     let currentStatus;
@@ -381,21 +378,19 @@ function record(channel) {
       const line = data.toString();
 
       const regex = /^\[(r|sk)ipping.*] (.*) \[(.{7})]$/m;
-      const res = line.match(regex);
+      const result = line.match(regex);
 
-      if (res && res[1] && res[2]) {
-        if ((currentStatus !== res[1] || currentTitle !== res[2]) && res[2].length > 1) {
-          if (res[3] && trim(res[3]) === '0b') {
-            return;
-          }
-
-          currentStatus = res[1];
-          currentTitle = res[2];
-
-          const time = dateFormat(new Date(), 'HH:mm:ss');
-          const status = res[1] === 'r' ? 'Recording' : 'Skipping ';
-          console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
+      if (result && result[1] && result[2] && (currentStatus !== result[1] || currentTitle !== result[2]) && result[2].length > 1) {
+        if (result[3] && trim(result[3]) === '0b') {
+          return;
         }
+
+        currentStatus = result[1];
+        currentTitle = result[2];
+
+        const time = dateFormat(new Date(), 'HH:mm:ss');
+        const status = result[1] === 'r' ? 'Recording' : 'Skipping ';
+        console.log(`  ${chalk.yellow(time)}  ${chalk.bold(status)}  ${currentTitle}`);
       }
     });
 
@@ -427,7 +422,7 @@ async function init() {
 
   console.log();
 
-  const [command, ...params] = cli.input;
+  const [command, ...parameters] = cli.input;
 
   if (!command && !cli.flags.v && !cli.flags.h) {
     interactive();
@@ -439,29 +434,29 @@ async function init() {
     return;
   }
 
-  if (utils.equalsAny(command, ['info', 'i']) && params.length > 0) {
-    info(params[0]);
+  if (utils.equalsAny(command, ['info', 'i']) && parameters.length > 0) {
+    info(parameters[0]);
     return;
   }
 
-  if (utils.equalsAny(command, ['play', 'p']) && params.length > 0) {
-    play(params[0]);
+  if (utils.equalsAny(command, ['play', 'p']) && parameters.length > 0) {
+    play(parameters[0]);
     return;
   }
 
-  if (utils.equalsAny(command, ['record', 'r']) && params.length > 0) {
+  if (utils.equalsAny(command, ['record', 'r']) && parameters.length > 0) {
     try {
-      const channel = await somafm.getChannel(params[0]);
+      const channel = await somafm.getChannel(parameters[0]);
       record(channel);
       return;
-    } catch (err) {
-      console.error(err.toString());
+    } catch (error) {
+      console.error(error.toString());
       process.exit(10);
     }
   }
 
   if (utils.equalsAny(command, ['list-favourites', 'list-favorites', 'lf'])) {
-    listFavourites(params);
+    listFavourites(parameters);
     return;
   }
 

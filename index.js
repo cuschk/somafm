@@ -7,7 +7,7 @@ const makeDir = require('make-dir');
 const ini = require('ini');
 const trim = require('trim');
 const CacheConf = require('cache-conf');
-const utils = require('./utils');
+const utils = require('./utils.js');
 const pkg = require('./package.json');
 
 const PREFERRED_STREAMS = [
@@ -27,7 +27,7 @@ const channelsConf = new CacheConf({projectName: pkg.name, configName});
 let channels = [];
 
 async function getChannels(options) {
-  options = Object.assign({}, options);
+  options = {...options};
   options.streams = Object.assign(PREFERRED_STREAMS, options.streams);
 
   const randomChannel = {
@@ -52,13 +52,13 @@ async function getChannelsFromAPIOrCache(options) {
     return setCachedChannels(await getChannelsFromAPI(options));
   }
 
-  return Promise.resolve(channels);
+  return channels;
 }
 
 async function getChannelsFromAPI(options) {
-  const res = await got('https://api.somafm.com/channels.json', GOT_OPTS);
+  const response = await got('https://api.somafm.com/channels.json', GOT_OPTS);
 
-  return parseJSONData(res.body, options);
+  return parseJSONData(response.body, options);
 }
 
 function parseJSONData(json, options) {
@@ -129,7 +129,7 @@ function applyFilter(channels, search) {
 }
 
 async function getChannel(id, options) {
-  options = Object.assign({sortChannels: true}, options);
+  options = {sortChannels: true, ...options};
 
   const channels = await getChannels(options);
   const channel = await getChannelById(id, channels);
@@ -147,7 +147,7 @@ async function getChannel(id, options) {
     got.stream(channel.image).pipe(fs.createWriteStream(channel.imageFile));
   }
 
-  return Promise.resolve(channel);
+  return channel;
 }
 
 function getChannelById(id, channels) {
@@ -177,22 +177,21 @@ function getStreamUrls(channel) {
 }
 
 function getUrlsFromPlaylist(playlistUrl) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => { // eslint-disable-line no-async-promise-executor
     const response = await got(playlistUrl);
 
     try {
       const data = ini.decode(response.body);
-      const res = [];
+      const result = [];
 
-      Object.keys(data.playlist)
-        .filter(x => x.match(/^File\d+$/))
-        .forEach(key => {
-          res.push(data.playlist[key]);
-        });
+      for (const key of Object.keys(data.playlist)
+        .filter(x => x.match(/^File\d+$/))) {
+        result.push(data.playlist[key]);
+      }
 
-      resolve(res);
-    } catch (err) {
-      reject(err);
+      resolve(result);
+    } catch (error) {
+      reject(error);
     }
   });
 }
@@ -206,7 +205,7 @@ function setCachedChannels(data) {
     channels = data;
 
     // Cache channels for one minute
-    channelsConf.set('channels', data, {maxAge: 60000});
+    channelsConf.set('channels', data, {maxAge: 60_000});
 
     resolve(data);
   });

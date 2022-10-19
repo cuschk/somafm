@@ -7,9 +7,7 @@ const levenshtein = require('fast-levenshtein').get;
  * @param  {Array<String>} arr Array of strings to search in
  * @return {Boolean} true/false
  */
-const equalsAny = (search, arr) => {
-  return arr.indexOf(search) > -1;
-};
+const equalsAny = (search, array) => array.includes(search);
 
 /**
  * Check if a string is a substring of another string
@@ -17,7 +15,7 @@ const equalsAny = (search, arr) => {
  * @param  {String} str String to search in
  * @return {Boolean} true/false
  */
-const isSubstringOf = (search, str) => str.toLowerCase().includes(search);
+const isSubstringOf = (search, string_) => string_.toLowerCase().includes(search);
 
 /**
  * Check if two strings match fuzzily
@@ -25,7 +23,7 @@ const isSubstringOf = (search, str) => str.toLowerCase().includes(search);
  * @param  {String} str     Second string
  * @return {Boolean}        `true`, if strings matchs fuzzily, `false` otherwise
  */
-const fuzzyMatch = (search, str) => levenshtein(search, str) < 3;
+const fuzzyMatch = (search, string_) => levenshtein(search, string_) < 3;
 
 /**
  * Check if string is substring of or fuzzy-matches any string in an array
@@ -33,8 +31,8 @@ const fuzzyMatch = (search, str) => levenshtein(search, str) < 3;
  * @param  {Array<String>} arr  Array to search in
  * @return {Boolean}            `true`, if `search` is found in `arr`, `false` otherwise
  */
-const isSubstringOfAny = (search, arr) =>
-  arr.some(str => isSubstringOf(search, str) || fuzzyMatch(str.toLowerCase(), search));
+const isSubstringOfAny = (search, array) =>
+  array.some(string_ => isSubstringOf(search, string_) || fuzzyMatch(string_.toLowerCase(), search));
 
 const searchArrayMatchesAny = (search, items) => {
   for (const searchItem of search) {

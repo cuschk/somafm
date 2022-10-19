@@ -1,6 +1,6 @@
 'use strict';
 const Conf = require('conf');
-const utils = require('./utils');
+const utils = require('./utils.js');
 
 const favouritesConf = new Conf({configName: 'favourites'});
 
@@ -28,7 +28,7 @@ const filterFavourites = (favourites, search) =>
   }));
 
 const getFavourites = options => {
-  options = Object.assign({}, options);
+  options = {...options};
 
   readFavourites();
 
