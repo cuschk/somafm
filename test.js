@@ -1,6 +1,6 @@
-import test from 'ava';
-import execa from 'execa';
-import m from '.';
+const test = require('ava');
+const execa = require('execa');
+const m = require('.');
 
 test.serial('fetch channels from API', async t => {
   const channels = await m.getChannels({forceUpdate: true});
@@ -23,10 +23,10 @@ test.serial('get single channel', async t => {
 
 test.serial('cli list', async t => {
   const processList = await execa('./cli.js', ['list']);
-  t.is(processList.code, 0);
+  t.is(processList.exitCode, 0);
 
   const processSearch = await execa('./cli.js', ['list', 'ambient']);
-  t.is(processSearch.code, 0);
+  t.is(processSearch.exitCode, 0);
 
   t.true(processList.stdout.length > processSearch.stdout.length);
 });
