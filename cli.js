@@ -49,7 +49,7 @@ const cli = meow(`
               Edit your favourite songs
 
   Options
-    -n        Don't show desktop notifications
+    -n        Show desktop notifications
 
   Keyboard shortcuts
     When playing, the following keyboard shortcuts are available:
@@ -82,7 +82,7 @@ const showDesktopNotification = (data, favourite) => {
   notifier.notify(data);
 };
 const noop = () => {};
-let notify = showDesktopNotification;
+let notify = noop;
 
 function getWidth(stream) {
   const columns = stream.columns; // eslint-disable-line prefer-destructuring
@@ -202,10 +202,6 @@ async function playChannel(channel) {
   stdin.setEncoding('utf-8');
 
   stdin.on('data', key => {
-    if (player.keyPress && ['m', '9', '0', '/', '*'].indexOf(key) > -1) {
-      playerProc.stdin.write(key);
-    }
-
     if (key === 'c') {
       copy(currentTitle);
     }
@@ -228,13 +224,13 @@ async function playChannel(channel) {
       windowTitle(currentTitle, currentOptions.isFavourite);
     }
 
-    if (['d', 'b'].indexOf(key) > -1) {
+    if (key === 'n') {
       // Enable desktop notifications
       notify = showDesktopNotification;
     }
 
-    if (key === 'n') {
-      // Disable desktop notifications
+    if (key === 'm') {
+      // Disable/mute desktop notifications
       notify = noop;
     }
 

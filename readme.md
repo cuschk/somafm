@@ -12,7 +12,7 @@
 - Play all [SomaFM channels](https://somafm.com/listen/) directly in your terminal.
 - Play [random channel](#-somafm-play-channel--random).
 - Nice & clean output of playing song including timestamp and song history.
-- Desktop notifications on track change ([can be disabled](#-n)).
+- Desktop notifications on track change [can be enabled](#-n).
 - [Specify channel directly](#-somafm-play-channel--random) or use [interactive mode](#-somafm).
 - [Show channel list and search](#-somafm-list-keywords) by name and genre.
 - Hit <kbd>+</kbd> to instantly add playing song to [favourites list](#-somafm-list-favourites-keywords).
@@ -90,7 +90,7 @@ Command           | Alias
 
 #### `-n`
 
-Don't show desktop notifications.
+Show desktop notifications.
 
 ### Keyboard shortcuts
 
@@ -101,6 +101,6 @@ Description                          | Key
 Copy current song title to clipboard | <kbd>c</kbd>
 Add current song to favourites       | <kbd>+</kbd> or <kbd>f</kbd>
 Remove current song from favourites  | <kbd>-</kbd> or <kbd>u</kbd>
-Enable desktop notifications         | <kbd>d</kbd>
-Disable desktop notifications        | <kbd>n</kbd>
+Enable desktop notifications         | <kbd>n</kbd>
+Disable/mute desktop notifications   | <kbd>m</kbd>
 Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
