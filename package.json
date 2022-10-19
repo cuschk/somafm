@@ -3,7 +3,7 @@
   "version": "2.7.0",
   "description": "Play and record SomaFM radio channels",
   "license": "MIT",
-  "repository": "uschek/somafm",
+  "repository": "cuschk/somafm",
   "author": {
     "name": "Christoph Uschkrat",
     "email": "christoph@uschkrat.com",
