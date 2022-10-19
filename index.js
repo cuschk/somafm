@@ -19,7 +19,7 @@ const PREFERRED_STREAMS = [
   {quality: 'low', format: 'mp3'}
 ];
 
-const GOT_OPTS = {headers: {'user-agent': `somafm/${pkg.version} (https://github.com/uschek/somafm)`}};
+const GOT_OPTS = {headers: {'user-agent': `somafm/${pkg.version}`}};
 
 const configName = (process.env.NODE_ENV === 'test' ? 'channels-test' : 'channels');
 const channelsConf = new CacheConf({projectName: pkg.name, configName});
