@@ -1,4 +1,4 @@
-# SomaFM [![Build Status](https://travis-ci.org/uschek/somafm.svg?branch=master)](https://travis-ci.org/uschek/somafm)
+# SomaFM
 
 > Play & record [SomaFM](https://somafm.com) radio channels
 
