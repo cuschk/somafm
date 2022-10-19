@@ -359,7 +359,7 @@ function record(channel) {
       reject(new Error('Streamripper executable not found. Please ensure Streamripper is installed on your system and runnable with the "streamripper" command.'));
     }
 
-    const date = dateFormat(new Date(), 'YYYYMMDD_HHmmss');
+    const date = dateFormat(new Date(), 'yyyyMMdd_HHmmss');
     const args = [
       channel.stream.url,
       '-D',
@@ -408,7 +408,7 @@ async function listFavourites(search) {
     let output = favourites.isObject(item) ? item.title : item;
 
     if (item.channelTitle && item.channelTitle.length > 0) {
-      output += ' ' + chalk.dim('· ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'YY/MM/DD'));
+      output += ' ' + chalk.dim('· ' + item.channelTitle + ' · ' + dateFormat(item.timestamp, 'yy/MM/dd'));
     }
 
     console.log(`  ${chalk.red(figures.favourite)} ${trim.left(wrap(output, {marginLeft: 4}))}`);
