@@ -349,7 +349,7 @@ function logTitle(title, options) {
     outputOptions.marginLeft += 2;
   }
 
-  logUpdate(` ${chalk.dim(options.time)}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
+  logUpdate(`  ${chalk.dim(options.time)}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
 }
 
 function windowTitle(title, isFavourite) {
