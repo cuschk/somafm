@@ -178,7 +178,7 @@ function getPlayer() {
       resolve(player);
     }
 
-    reject(new Error('The mpv executable was not found. Please ensure mpv is installed on your system and runnable within your shell.'));
+    reject(new Error('mpv executable not found. Please ensure mpv is installed on your system and runnable with the "mpv" command.'));
   });
 }
 
