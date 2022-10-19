@@ -63,23 +63,13 @@ const cli = meow(`
     d         Enable desktop notifications
     n         Disable desktop notifications
     q | esc   Stop playback & quit application
-
-    * MPlayer only
 `);
 
-const players = [
-  {
-    cmd: 'mplayer',
-    args: ['-quiet'],
-    titleRegex: /StreamTitle='(.*)';StreamUrl=/,
-    keyPress: true
-  },
-  {
-    cmd: 'mpv',
-    args: ['--msg-level=all=info'],
-    titleRegex: /.*icy-title: (.*)$/
-  }
-];
+const player = {
+  cmd: 'mpv',
+  args: ['--msg-level=all=info'],
+  titleRegex: /.*icy-title: (.*)$/
+};
 const streamripperBin = 'streamripper';
 
 const spinner = ora({color: 'yellow'});
@@ -185,13 +175,11 @@ async function play(channelId) {
 
 function getPlayer() {
   return new Promise((resolve, reject) => {
-    for (const player of players) {
-      if (isBin(player.cmd)) {
-        resolve(player);
-      }
+    if (isBin(player.cmd)) {
+      resolve(player);
     }
 
-    reject(new Error('No player executable found. Please ensure MPlayer or mpv is installed on your system and runnable within your shell.'));
+    reject(new Error('The mpv executable was not found. Please ensure mpv is installed on your system and runnable within your shell.'));
   });
 }
 

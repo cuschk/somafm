@@ -34,7 +34,7 @@ or with [npm](https://www.npmjs.com):
 $ npm install --global somafm
 ```
 
-Playing a channel requires [MPlayer](https://mplayerhq.hu) or [mpv](https://mpv.io) on your system. Please make sure you have at least one of them installed and the `mplayer` or `mpv` command can be run within your shell.
+Playing a channel requires [mpv](https://mpv.io) on your system. Please make sure you have it installed and the `mpv` command can be run within your shell.
 
 To record a channel, you need [Streamripper](http://streamripper.sourceforge.net) and its executable `streamripper`.
 
@@ -101,11 +101,6 @@ Description                          | Key
 Copy current song title to clipboard | <kbd>c</kbd>
 Add current song to favourites       | <kbd>+</kbd> or <kbd>f</kbd>
 Remove current song from favourites  | <kbd>-</kbd> or <kbd>u</kbd>
-Increase volume*                     | <kbd>\*</kbd> or <kbd>0</kbd>
-Decrease volume*                     | <kbd>/</kbd> or <kbd>9</kbd>
-Mute/unmute*                         | <kbd>m</kbd>
 Enable desktop notifications         | <kbd>d</kbd>
 Disable desktop notifications        | <kbd>n</kbd>
 Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
-
-<small>_* MPlayer only_</small>
