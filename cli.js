@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-const childProcess = require('child_process');
+const execa = require('execa');
 const chalk = require('chalk');
 const meow = require('meow');
 const ora = require('ora');
@@ -193,7 +193,7 @@ async function playChannel(channel) {
   console.log(wrap(`${chalk.blue(channel.description)}\n`));
 
   const args = [...player.args, channel.stream.urls[0]];
-  const playerProc = childProcess.spawn(player.cmd, args);
+  const playerProcess = execa(player.cmd, args);
 
   const stdin = process.stdin; // eslint-disable-line prefer-destructuring
   stdin.setRawMode(true);
@@ -241,11 +241,14 @@ async function playChannel(channel) {
 
       logUpdate.done();
 
-      playerProc.kill();
+      playerProcess.cancel();
+      setTimeout(() => {
+        playerProcess.kill('SIGTERM', {forceKillAfterTimeout: 2000});
+      }, 1000);
     }
   });
 
-  playerProc.stdout.on('data', data => {
+  playerProcess.stdout.on('data', data => {
     const line = trim(data.toString());
 
     const result = line.match(player.titleRegex);
@@ -278,9 +281,9 @@ async function playChannel(channel) {
     }
   });
 
-  playerProc.on('error', Promise.reject);
+  playerProcess.on('error', Promise.reject);
 
-  playerProc.on('exit', () => {
+  playerProcess.on('exit', () => {
     termTitle();
     process.exit(0);
   });
@@ -365,7 +368,7 @@ function record(channel) {
       '-D',
       `${channel.fullTitle}/${date}/%1q %A - %T`
     ];
-    const streamripperProc = childProcess.spawn(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
+    const streamripperProcess = execa(streamripperBin, args, {stdio: [process.stdin, 'pipe', 'pipe']});
     let currentStatus;
     let currentTitle;
 
@@ -375,7 +378,7 @@ function record(channel) {
   to directory ${chalk.yellow(`${channel.fullTitle}/${date}`)}\n`
     );
 
-    streamripperProc.stdout.on('data', data => {
+    streamripperProcess.stdout.on('data', data => {
       const line = data.toString();
 
       const regex = /^\[(r|sk)ipping.*] (.*) \[(.{7})]$/m;
@@ -395,9 +398,9 @@ function record(channel) {
       }
     });
 
-    streamripperProc.on('error', reject);
+    streamripperProcess.on('error', reject);
 
-    streamripperProc.on('exit', resolve);
+    streamripperProcess.on('exit', resolve);
   });
 }
 
