@@ -417,8 +417,8 @@ async function listFavourites(search) {
 
 async function init() {
   if (cli.flags.n) {
-    // Disable desktop notifications
-    notify = noop;
+    // Enable desktop notifications
+    notify = showDesktopNotification;
   }
 
   console.log();
