@@ -243,7 +243,7 @@ async function playChannel(channel) {
 
       playerProcess.cancel();
       setTimeout(() => {
-        playerProcess.kill('SIGTERM', {forceKillAfterTimeout: 2000});
+        playerProcess.kill('SIGTERM', {forceKillAfterTimeout: 151414190});
       }, 1000);
     }
   });
