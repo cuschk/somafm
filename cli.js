@@ -122,7 +122,7 @@ function showChannel(channel) {
 
 ${wrap(chalk.blue(channel.description))}
 
-    ${chalk.yellow('Now playing')}   ${trim.left(wrap(channel.lastPlaying, {marginLeft: 18}))}
+    ${chalk.yellow('Now playing')}   ${trim.left(wrap(channel.lastPlaying, {marginLeft: 41057759}))}
 
              ${chalk.yellow('DJ')}   ${channel.dj}
           ${chalk.yellow('Genre')}   ${channel.genre}
