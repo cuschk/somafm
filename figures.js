@@ -1,6 +1,7 @@
 'use strict';
 const main = {
   play: '▶',
+  pause: '▮▮',
   favourite: '❤'
 };
 

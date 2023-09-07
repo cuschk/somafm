@@ -194,7 +194,7 @@ async function playChannel(channel) {
 
   const args = [...player.args, channel.stream.urls[0]];
   const playerProcess = execa(player.cmd, args);
-
+  let isPaused = false;  // Variable to keep track of playback state
   const stdin = process.stdin; // eslint-disable-line prefer-destructuring
   stdin.setRawMode(true);
   stdin.resume();
@@ -212,7 +212,7 @@ async function playChannel(channel) {
         isPlaying: true,
         isFavourite: true
       }));
-      windowTitle(currentTitle, currentOptions.isFavourite);
+      windowTitle(currentTitle, currentOptions);
     }
 
     if (['u', '-'].includes(key)) {
@@ -220,7 +220,7 @@ async function playChannel(channel) {
       currentOptions.isFavourite = false;
 
       logTitle(currentTitle, currentOptions);
-      windowTitle(currentTitle, currentOptions.isFavourite);
+      windowTitle(currentTitle, currentOptions);
     }
 
     if (key === 'n') {
@@ -253,10 +253,12 @@ async function playChannel(channel) {
         // Resume the playerProcess
         playerProcess.kill('SIGCONT')
         isPaused = false;
+        logTitle(currentTitle, Object.assign(currentOptions, { isPlaying: true }));
       } else {
         // Pause the playerProcess
         playerProcess.kill('SIGSTOP')
         isPaused =  true;
+        logTitle(currentTitle, Object.assign(currentOptions, { isPlaying: false }));
       }
     }
 
@@ -286,7 +288,7 @@ async function playChannel(channel) {
 
       logUpdate.done();
       logTitle(currentTitle, currentOptions);
-      windowTitle(currentTitle, currentOptions.isFavourite);
+      windowTitle(currentTitle, currentOptions);
       notify({
         title: currentTitle,
         message: channel.fullTitle,
@@ -346,11 +348,12 @@ function logTitle(title, options) {
 
   let prefix = '';
 
-  if (options.isPlaying || options.isFavourite) {
-    const colorFn = options.isPlaying ? chalk.green : chalk.red;
-    const figure = options.isFavourite ? figures.favourite : figures.play;
-
-    prefix = `${colorFn(figure)} `;
+  if (options.isPlaying) {
+    prefix = `${chalk.green(figures.play)} `;
+  } else if (options.isFavourite) {
+    prefix = `${chalk.red(figures.favourite)} `;
+  } else {
+    prefix = `${chalk.yellow(figures.pause)} `;
   }
 
   if (options.isAnnouncement) {
@@ -366,8 +369,8 @@ function logTitle(title, options) {
   logUpdate(`  ${chalk.dim(options.time)}  ${prefix}${trim.left(wrap(title, outputOptions))}`);
 }
 
-function windowTitle(title, isFavourite) {
-  termTitle(`${isFavourite ? figures.favourite : figures.play} ${title}`);
+function windowTitle (title, currentOptions) {
+  termTitle(`${currentOptions.isFavourite ? figures.favourite : currentOptions.isPlaying ? figures.play : figures.pause} ${title}`);
 }
 
 function record(channel) {
