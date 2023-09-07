@@ -233,19 +233,33 @@ async function playChannel(channel) {
       notify = noop;
     }
 
-    // `ctrl`+`c`, `esc`, `q`
+    // `ctrl`+`c`, `esc`, `q`to quit
     if (['\u0003', '\u001B', 'q'].includes(key)) {
       if (currentTitle) {
-        logTitle(currentTitle, Object.assign(currentOptions, {isPlaying: false}));
+        logTitle(currentTitle, Object.assign(currentOptions, { isPlaying: false }));
       }
 
       logUpdate.done();
 
       playerProcess.cancel();
       setTimeout(() => {
-        playerProcess.kill('SIGTERM', {forceKillAfterTimeout: 2000});
+        playerProcess.kill('SIGTERM', { forceKillAfterTimeout: 2000 });
       }, 1000);
     }
+
+    // Listen for space keypress event to pause/resume playback
+    if (key === ' ') {
+      if (isPaused) {
+        // Resume the playerProcess
+        playerProcess.kill('SIGCONT')
+        isPaused = false;
+      } else {
+        // Pause the playerProcess
+        playerProcess.kill('SIGSTOP')
+        isPaused =  true;
+      }
+    }
+
   });
 
   playerProcess.stdout.on('data', data => {

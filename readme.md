@@ -104,3 +104,4 @@ Remove current song from favourites  | <kbd>-</kbd> or <kbd>u</kbd>
 Enable desktop notifications         | <kbd>n</kbd>
 Disable/mute desktop notifications   | <kbd>m</kbd>
 Stop playback & quit application     | <kbd>q</kbd> or <kbd>esc</kbd>
+Pause/resume playback                | <kbd>space</kbd>
